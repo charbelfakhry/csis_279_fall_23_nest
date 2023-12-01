@@ -85,7 +85,7 @@ function divide(num1: number, num2: number): number {
 }
 ```
 
-### DONT - write code like you would do in vanilla express.
+### 5 - DONT - write code like you would do in vanilla express.
 
 Always use nest js style code (springboot similar) and not express js style code.
 
