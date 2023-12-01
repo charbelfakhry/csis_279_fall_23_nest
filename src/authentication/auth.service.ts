@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-const { query } = require("../database/db");
-const bcrypt = require('bcrypt');
+import { query } from '../database/db'; // Assuming query is a default or named export from db
+import * as bcrypt from 'bcrypt';
+
 const saltRounds = 10; // The cost factor, controls how much time is needed to calculate a single BCrypt hash
 
 @Injectable()

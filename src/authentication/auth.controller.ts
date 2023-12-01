@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
-var jwt = require('jsonwebtoken');
+import * as jwt from 'jsonwebtoken';
 
 @Controller('auth')
 export class AuthController {
