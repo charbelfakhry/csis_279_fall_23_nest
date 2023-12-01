@@ -7,6 +7,7 @@ Please keep note of the following when you want to push a change:
   - Add a message to the commit that briefly describes the change you added.
 
   - Before you push, pull the code and handle conflicts if they exist.
+  - ### ⚠️️️️️️️⚠️READ THE STYLE GUID [STYLEGUIDE.md](STYLEGUID.md)⚠️️️️️️️⚠️
 ---
 # Description
 
