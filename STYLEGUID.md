@@ -42,9 +42,9 @@ user.test.ts
 ```typescript
 // This is bad!
 const express = require("express");
-const {useState} = require("react");
+const { useState } = require("react");
 
-module.exports = {app: express()};
+module.exports = { app: express() };
 
 // This is good!
 import express from "express";
@@ -54,7 +54,8 @@ const app = express();
 
 export default app;
 
-export function hello(){};
+export function hello() {
+};
 ```
 
 ### 4 - DO use JSDOC documentation style
@@ -64,7 +65,7 @@ export function hello(){};
 
 // this function is used to divide two numbers
 function divide(num1: number, num2: number): number {
-  if(num2 === 0) throw new Error("can't divide by 0");
+  if (num2 === 0) throw new Error("can't divide by 0");
   return num1 / num2;
 }
 
@@ -72,21 +73,46 @@ function divide(num1: number, num2: number): number {
 
 /**
  * This function is used to divide two numbers.
- * 
- * @param num1 
+ *
+ * @param num1
  * @param num2
- * 
+ *
  * @throws Error when num2 = 0.
  */
 function divide(num1: number, num2: number): number {
-  if(num2 === 0) throw new Error("can't divide by 0");
+  if (num2 === 0) throw new Error("can't divide by 0");
   return num1 / num2;
+}
+```
+
+### DONT - write code like you would do in vanilla express.
+
+Always use nest js style code (springboot similar) and not express js style code.
+
+```typescript
+// DONT DO THIS
+import express from "express";
+
+function helloController(req: express.Request, res: express.Response) {
+  return res.status(200).send("Hello world.");
+}
+
+// DO THIS
+import { Controller, Get } from "@nestjs/common";
+
+@Controller("hello")
+export class HelloController {
+  @Get()
+  replyHelloWorld(): string {
+    return "Hello world."
+  }
 }
 ```
 
 ---
 
 # References
+
 1. ### [Nest js documentation](https://docs.nestjs.com/)
 2. ### [Typescript documentation](https://www.typescriptlang.org/docs/)
 3. ### [Typeorm documentation](https://typeorm.io/)
