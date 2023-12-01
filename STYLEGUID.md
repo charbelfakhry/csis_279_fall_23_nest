@@ -57,6 +57,33 @@ export default app;
 export function hello(){};
 ```
 
+### 4 - DO use JSDOC documentation style
+
+```typescript
+// DONT DO THIS
+
+// this function is used to divide two numbers
+function divide(num1: number, num2: number): number {
+  if(num2 === 0) throw new Error("can't divide by 0");
+  return num1 / num2;
+}
+
+// DO THIS
+
+/**
+ * This function is used to divide two numbers.
+ * 
+ * @param num1 
+ * @param num2
+ * 
+ * @throws Error when num2 = 0.
+ */
+function divide(num1: number, num2: number): number {
+  if(num2 === 0) throw new Error("can't divide by 0");
+  return num1 / num2;
+}
+```
+
 ---
 
 # References
