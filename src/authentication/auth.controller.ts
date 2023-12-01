@@ -1,14 +1,18 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import * as jwt from 'jsonwebtoken';
+import { SignInCredentials, SignUpUserInfo } from 'src/types/auth.types';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('authenticate')
-  async authenticateUser(@Body('user') user, @Res() res: Response) {
+  async authenticateUser(
+    @Body('user') user: SignInCredentials | null,
+    @Res() res: Response,
+  ) {
     try {
       // Check if the user is empty
       if (!user) {
@@ -23,7 +27,7 @@ export class AuthController {
         let token;
         try {
           token = jwt.sign(
-            { userId: result.user.client_id },
+            { user_id: result.user!.user_id },
             process.env.SECRET_KEY,
           );
         } catch (tokenError) {
@@ -45,7 +49,10 @@ export class AuthController {
   }
 
   @Post('signup')
-  async insertUser(@Body('user') user, @Res() res: Response) {
+  async addUser(
+    @Body('user') user: SignUpUserInfo | null,
+    @Res() res: Response,
+  ) {
     try {
       // Validate the presence of user data
       if (!user) {
@@ -62,7 +69,7 @@ export class AuthController {
         try {
           // Generating JWT token
           token = jwt.sign(
-            { userId: result.user.client_id },
+            { user_id: result.user!.user_id },
             process.env.SECRET_KEY,
           );
         } catch (tokenError) {
@@ -81,7 +88,7 @@ export class AuthController {
     } catch (error) {
       // Log the error
       console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ message: 'Internal server error' });
     }
   }
 }
