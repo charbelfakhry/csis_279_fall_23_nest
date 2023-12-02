@@ -3,27 +3,20 @@ CREATE DATABASE IF NOT EXISTS social_media_db;
 USE social_media_db;
 
 
-CREATE TABLE IF NOT EXISTS images (
-    image_id INT AUTO_INCREMENT PRIMARY KEY,
-    image_url VARCHAR(255) NOT NULL UNIQUE
-);
-
 CREATE TABLE IF NOT EXISTS users (
-                                     user_id INT AUTO_INCREMENT PRIMARY KEY,
-                                     username VARCHAR(255) NOT NULL UNIQUE,
-                                     email VARCHAR(255) NOT NULL UNIQUE,
-                                     password_hash VARCHAR(255) NOT NULL,
-                                     full_name VARCHAR(255) NOT NULL,
-                                     bio TEXT,
-                                     profile_picture INT,
-                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                     FOREIGN KEY (profile_picture) REFERENCES images(image_id)
+    user_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    bio TEXT,
+    profile_picture_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 
 CREATE TABLE IF NOT EXISTS posts (
-    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
     user_id INT,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -32,7 +25,7 @@ CREATE TABLE IF NOT EXISTS posts (
 
 
 CREATE TABLE IF NOT EXISTS comments (
-    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
     user_id INT,
     post_id INT,
     content TEXT NOT NULL,
@@ -43,7 +36,7 @@ CREATE TABLE IF NOT EXISTS comments (
 
 
 CREATE TABLE IF NOT EXISTS likes (
-    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    like_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
     user_id INT,
     post_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -53,7 +46,7 @@ CREATE TABLE IF NOT EXISTS likes (
 
 
 CREATE TABLE IF NOT EXISTS friendships (
-    friendship_id INT AUTO_INCREMENT PRIMARY KEY,
+    friendship_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
     user_id1 INT,
     user_id2 INT,
     status ENUM('pending', 'accepted') DEFAULT 'pending',
@@ -64,7 +57,7 @@ CREATE TABLE IF NOT EXISTS friendships (
 
 
 CREATE TABLE IF NOT EXISTS notifications (
-    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    notification_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
     user_id INT,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
