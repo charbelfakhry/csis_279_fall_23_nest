@@ -4,7 +4,7 @@ USE social_media_db;
 
 
 CREATE TABLE IF NOT EXISTS users (
-    user_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
+    user_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 CREATE TABLE IF NOT EXISTS posts (
-    post_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
-    user_id INT,
+    post_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
+    user_id BINARY(16),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS posts (
 
 
 CREATE TABLE IF NOT EXISTS comments (
-    comment_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
-    user_id INT,
-    post_id INT,
+    comment_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
+    user_id BINARY(16),
+    post_id BINARY(16),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS comments (
 
 
 CREATE TABLE IF NOT EXISTS likes (
-    like_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
-    user_id INT,
-    post_id INT,
+    like_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
+    user_id BINARY(16),
+    post_id BINARY(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (post_id) REFERENCES posts(post_id)
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS likes (
 
 
 CREATE TABLE IF NOT EXISTS friendships (
-    friendship_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
-    user_id1 INT,
-    user_id2 INT,
+    friendship_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
+    user_id1 BINARY(16),
+    user_id2 BINARY(16),
     status ENUM('pending', 'accepted') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id1) REFERENCES users(user_id),
@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS friendships (
 
 
 CREATE TABLE IF NOT EXISTS notifications (
-    notification_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null,
-    user_id INT,
+    notification_id  BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
+    user_id BINARY(16),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
