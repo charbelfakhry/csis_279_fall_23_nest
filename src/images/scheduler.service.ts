@@ -8,5 +8,6 @@ export class ImageScheduleService {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   eraseUnusedFiles() {
     const PATH_TO_IMAGES = path.join(process.cwd(), 'static', 'images');
+    console.log(PATH_TO_IMAGES);
   }
 }

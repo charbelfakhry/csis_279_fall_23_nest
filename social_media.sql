@@ -2,7 +2,6 @@
 CREATE DATABASE IF NOT EXISTS social_media_db;
 USE social_media_db;
 
-
 CREATE TABLE IF NOT EXISTS users (
     user_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
