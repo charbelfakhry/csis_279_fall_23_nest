@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Param, Get, Put, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './notification.dto';
 
@@ -7,20 +15,34 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post(':userId')
-  async createNotification(@Param('userId') userId: number, @Body() createNotificationDto: CreateNotificationDto) {
-    const notification = await this.notificationsService.createNotification(userId, createNotificationDto);
+  async createNotification(
+    @Param('userId') userId: number,
+    @Body() createNotificationDto: CreateNotificationDto,
+  ) {
+    const notification = await this.notificationsService.createNotification(
+      userId,
+      createNotificationDto,
+    );
     return { notification };
   }
 
   @Get(':id')
   async getNotification(@Param('id') id: number) {
-    const notification = await this.notificationsService.getNotificationById(id);
+    const notification =
+      await this.notificationsService.getNotificationById(id);
     return { notification };
   }
 
   @Put(':id')
-  async updateNotification(@Param('id') id: number, @Body() updateNotificationDto: CreateNotificationDto) {
-    const updatedNotification = await this.notificationsService.updateNotification(id, updateNotificationDto);
+  async updateNotification(
+    @Param('id') id: number,
+    @Body() updateNotificationDto: CreateNotificationDto,
+  ) {
+    const updatedNotification =
+      await this.notificationsService.updateNotification(
+        id,
+        updateNotificationDto,
+      );
     return { updatedNotification };
   }
 
