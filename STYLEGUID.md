@@ -109,6 +109,50 @@ export class HelloController {
 }
 ```
 
+### 6 - DO use the nest js Logger instead of console.log
+
+```typescript
+// This is bad!!
+
+@Injectable()
+export class TasksService {
+
+  @Cron('45 * * * * *')
+  handleCron() {
+    console.log('Called when the current second is 45');
+  }
+}
+
+// This is good!!
+
+@Injectable()
+export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
+  @Cron('45 * * * * *')
+  handleCron() {
+    this.logger.debug('Called when the current second is 45');
+  }
+}
+```
+
+### 7 - DONT use the same log level for everything
+
+```typescript
+// Do the following
+@Injectable()
+export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
+  logging() {
+    this.logger.debug('This is an info message, mostly used for debugging.');
+    this.logger.error('This is an error message, something went wrong!');
+    this.logger.fatal(`This is also an error message, 
+                       but extremley severe. use this when something that breaks functionality happens.`);
+  }
+}
+```
+
 ---
 
 # References
