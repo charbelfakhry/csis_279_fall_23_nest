@@ -75,30 +75,28 @@ export class AuthController {
       // Calling the addUser function from authService
       const result = await this.authService.addUser(user);
 
-      // Check if user creation is successful
-      if (result.status === HttpStatusCode.OK) {
-        let token;
-        try {
-          // Generating JWT token
-          token = jwt.sign(
-            { user_id: result.user!.user_id },
-            process.env.SECRET_KEY,
-          );
-        } catch (tokenError) {
-          // Handling token generation errors
-          return res
-            .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-            .json({ message: 'Error generating token' });
-        }
-
-        // Sending the success response with token and user data
-        return res
-          .status(HttpStatusCode.OK)
-          .json({ message: result.message, user: result.user, token: token });
-      } else {
-        // Handling other types of user creation failures
+      if (result.status !== HttpStatusCode.OK) {
         return res.status(result.status).json({ message: result.message });
       }
+
+      let token: string;
+      try {
+        // Generating JWT token
+        token = jwt.sign(
+          { user_id: result.user!.user_id },
+          process.env.SECRET_KEY,
+        );
+      } catch (tokenError) {
+        // Handling token generation errors
+        return res
+          .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+          .json({ message: 'Error generating token' });
+      }
+
+      // Sending the success response with token and user data
+      return res
+        .status(HttpStatusCode.OK)
+        .json({ message: result.message, user: result.user, token: token });
     } catch (error) {
       // Log the error
       this.logger.fatal(error);
