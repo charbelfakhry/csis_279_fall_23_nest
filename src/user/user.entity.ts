@@ -6,9 +6,12 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToOne,
   Unique,
 } from 'typeorm';
 import { Post } from '../post/post.entity';
+import { Picture } from '../picture/picture.entity';
 import { hash } from 'bcrypt';
 
 @Entity('users')
@@ -42,6 +45,10 @@ export class User {
   // Risk of circular dependency
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
+   
+  @OneToOne(() => Picture)
+  @JoinColumn({ name: 'profile_picture_url' })
+  profilePicture!: Picture;
 
   @BeforeInsert()
   async hashPassword() {
