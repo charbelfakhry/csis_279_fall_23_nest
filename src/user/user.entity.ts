@@ -1,6 +1,13 @@
 // src/entities/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, 
-    Unique, BeforeInsert, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { Post } from '../post/post.entity';
 import { hash } from 'bcrypt';
 
@@ -33,12 +40,12 @@ export class User {
 
   // Reverse association
   // Risk of circular dependency
-  @OneToMany(() => Post, post => post.user)
+  @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
 
   @BeforeInsert()
   async hashPassword() {
-    this.password_hash = await hash(this.password_hash, 10);
+    this.password_hash = await hash(this.password_hash, 15);
   }
 
   constructor(
