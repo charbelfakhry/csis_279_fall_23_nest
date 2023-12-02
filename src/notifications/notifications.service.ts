@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateNotificationDto } from './notification.dto';
-import { NotificationEntity } from '../notifications/notification.entity';
-import { UserEntity } from '../notifications/user.entity'; // Import the UserEntity if not already imported
+import { NotificationEntity } from './notification.entity';
+import { UserEntity } from './user.entity'; // Import the UserEntity if not already imported
 
 @Injectable()
 export class NotificationsService {
@@ -14,7 +14,10 @@ export class NotificationsService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async createNotification(userId: number, createNotificationDto: CreateNotificationDto): Promise<NotificationEntity> {
+  async createNotification(
+    userId: number,
+    createNotificationDto: CreateNotificationDto,
+  ): Promise<NotificationEntity> {
     const user = await this.fetchUserById(userId);
 
     if (!user) {
@@ -29,8 +32,12 @@ export class NotificationsService {
     return this.notificationRepository.save(notification);
   }
 
-  async getNotificationById(notificationId: number): Promise<NotificationEntity> {
-    const notification = await this.notificationRepository.findOne({ where: { notification_id: notificationId } });
+  async getNotificationById(
+    notificationId: number,
+  ): Promise<NotificationEntity> {
+    const notification = await this.notificationRepository.findOne({
+      where: { notification_id: notificationId },
+    });
 
     if (!notification) {
       throw new NotFoundException('Notification not found');
@@ -39,21 +46,28 @@ export class NotificationsService {
     return notification;
   }
 
-  async updateNotification(notificationId: number, updateNotificationDto: CreateNotificationDto): Promise<NotificationEntity> {
-    const existingNotification = await this.notificationRepository.findOne({ where: { notification_id: notificationId } });
+  async updateNotification(
+    notificationId: number,
+    updateNotificationDto: CreateNotificationDto,
+  ): Promise<NotificationEntity> {
+    const existingNotification = await this.notificationRepository.findOne({
+      where: { notification_id: notificationId },
+    });
 
     if (!existingNotification) {
       throw new NotFoundException('Notification not found');
     }
 
     // Update notification properties
-    existingNotification.content = updateNotificationDto.content || ''; 
+    existingNotification.content = updateNotificationDto.content || '';
 
     return this.notificationRepository.save(existingNotification);
   }
 
   async deleteNotification(notificationId: number): Promise<void> {
-    const existingNotification = await this.notificationRepository.findOne({ where: { notification_id: notificationId } });
+    const existingNotification = await this.notificationRepository.findOne({
+      where: { notification_id: notificationId },
+    });
 
     if (!existingNotification) {
       throw new NotFoundException('Notification not found');
@@ -61,9 +75,11 @@ export class NotificationsService {
 
     await this.notificationRepository.remove(existingNotification);
   }
-  
+
   private async fetchUserById(userId: number): Promise<UserEntity | null> {
-    const user = await this.userRepository.findOne({ where: { user_id: userId } });
+    const user = await this.userRepository.findOne({
+      where: { user_id: userId },
+    });
 
     if (!user) {
       return null;

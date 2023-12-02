@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { NotificationEntity } from '../notifications/notification.entity';
+import { Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { NotificationEntity } from './notification.entity';
+
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -12,6 +13,9 @@ export class UserEntity {
   bio!: string;
   profile_picture!: number;
 
-  @OneToMany(() => NotificationEntity, (notification) => notification.user)
+  @OneToMany(
+    () => NotificationEntity,
+    (notification: NotificationEntity) => notification.user,
+  )
   notifications!: NotificationEntity[];
 }
