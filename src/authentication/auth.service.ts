@@ -112,7 +112,7 @@ export class AuthService {
                 user.email,
                 hashedPassword,
                 user.full_name,
-                new Date().toISOString(),
+                new Date(),
             ]);
 
             // Constructing user object to return, excluding the password
@@ -123,7 +123,7 @@ export class AuthService {
                 full_name: user.full_name,
                 bio: user.bio,
                 profile_picture_url: user.profile_picture_url,
-                created_at: new Date().toISOString(),
+                created_at: new Date(),
             };
 
             // Create the token and check for errors.
