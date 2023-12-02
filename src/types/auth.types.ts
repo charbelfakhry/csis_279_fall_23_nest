@@ -5,7 +5,7 @@ export type SignUpUserInfo = {
   full_name: string;
   bio: string;
   profile_picture_url: string;
-  created_at: string;
+  created_at: Date;
 };
 
 export type SignInCredentials = {
@@ -20,5 +20,5 @@ export type UserToFrontEnd = {
   full_name: string;
   bio: string;
   profile_picture_url: string;
-  created_at: string;
+  created_at: Date;
 };
