@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity('posts')
@@ -16,10 +23,7 @@ export class Post {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  constructor(
-    user: User,
-    content: string
-  ) {
+  constructor(user: User, content: string) {
     this.user = user;
     this.content = content;
   }
