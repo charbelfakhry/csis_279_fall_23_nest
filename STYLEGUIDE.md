@@ -170,6 +170,27 @@ if (message.status === HttpStatusCode.OK) {
 }
 ```
 
+### 9 - DO use throw new nest js error 
+```typescript
+// DONT DO THIS
+use(req: RequestWithUser, res: Repsonse, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    res.send({status: 401, message: "Unauthorized"});
+  }
+}
+
+// DO THIS
+use(req: RequestWithUser, res: Response, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    throw new UnauthorizedException('No token provided');
+  }
+}
+```
+
 ---
 
 # References
