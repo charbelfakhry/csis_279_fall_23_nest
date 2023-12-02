@@ -116,3 +116,4 @@ export class HelloController {
 1. ### [Nest js documentation](https://docs.nestjs.com/)
 2. ### [Typescript documentation](https://www.typescriptlang.org/docs/)
 3. ### [Typeorm documentation](https://typeorm.io/)
+4. ### [Git documentation](https://git-scm.com/docs/git)
