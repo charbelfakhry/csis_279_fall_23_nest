@@ -1,18 +1,16 @@
 import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import * as jwt from 'jsonwebtoken';
 import { SignInCredentials, SignUpUserInfo } from 'src/types/auth.types';
 import { AuthService } from './auth.service';
 import { HttpStatusCode } from '../types/http.types';
 import { AppController } from '../app.controller';
-import * as http from 'http';
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AppController.name);
   constructor(private authService: AuthService) {}
 
-  @Post('authenticate')
+  @Post('login')
   async authenticateUser(
     @Body('user') user: SignInCredentials | null,
     @Res() res: Response,
@@ -25,30 +23,17 @@ export class AuthController {
           .json({ message: 'Missing Data' });
       }
 
-      // Call the authService's authenticate function.
+      // Call the authService authenticate function to generate the JWT token.
       const result = await this.authService.authenticate(user);
 
       if (result.status !== HttpStatusCode.OK) {
         return res.status(result.status).json({ message: result.message });
       }
 
-      // Generate the JWT token.
-      let token: string;
-      try {
-        token = jwt.sign(
-          { user_id: result.user!.user_id },
-          process.env.SECRET_KEY,
-        );
-      } catch (tokenError) {
-        return res
-          .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: 'Error generating token' });
-      }
-
       // Send the token and the user information back to the client-side.
       return res
         .status(HttpStatusCode.OK)
-        .json({ message: result.message, user: result.user, token: token });
+        .json({ message: result.message, user: result.user, token: result.token });
     } catch (error) {
       // Log the error
       this.logger.fatal(error);
@@ -72,31 +57,17 @@ export class AuthController {
           .json({ message: 'Missing Data' });
       }
 
-      // Calling the addUser function from authService
+      // Call the addUser function from authService and generate the JWT token
       const result = await this.authService.addUser(user);
 
       if (result.status !== HttpStatusCode.OK) {
         return res.status(result.status).json({ message: result.message });
       }
 
-      let token: string;
-      try {
-        // Generating JWT token
-        token = jwt.sign(
-          { user_id: result.user!.user_id },
-          process.env.SECRET_KEY,
-        );
-      } catch (tokenError) {
-        // Handling token generation errors
-        return res
-          .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-          .json({ message: 'Error generating token' });
-      }
-
       // Sending the success response with token and user data
       return res
         .status(HttpStatusCode.OK)
-        .json({ message: result.message, user: result.user, token: token });
+        .json({ message: result.message, user: result.user, token: result.token });
     } catch (error) {
       // Log the error
       this.logger.fatal(error);
