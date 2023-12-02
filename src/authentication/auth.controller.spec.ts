@@ -113,7 +113,7 @@ describe('AuthController', () => {
           full_name: 'test',
           bio: 'test',
           profile_picture_url: 'test',
-          created_at: 'test',
+          created_at: new Date(),
         },
         mockResponse as Response,
       );
@@ -138,7 +138,7 @@ describe('AuthController', () => {
           full_name: 'Fist Test',
           bio: 'This is the first test',
           profile_picture_url: 'https://www.google.com',
-          created_at: '2021-09-29 00:00:00',
+          created_at: new Date(),
         },
         mockResponse as Response,
       );
