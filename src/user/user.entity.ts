@@ -45,7 +45,7 @@ export class User {
   // Risk of circular dependency
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
-   
+
   @OneToOne(() => Picture)
   @JoinColumn({ name: 'profile_picture_url' })
   profilePicture!: Picture;
