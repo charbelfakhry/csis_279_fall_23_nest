@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import {
   SignInCredentials,
   SignUpUserInfo,
   UserToFrontEnd,
 } from 'src/types/auth.types';
-import { query } from '../database/db'; // Assuming query is a default or named export from db
+import { query } from '../database/db';
+import { HttpStatusCode } from '../types/http.types'; // Assuming query is a default or named export from db
 
-const saltRounds = 10; // The cost factor, controls how much time is needed to calculate a single BCrypt hash
+const SALT_ROUNDS = 15; // The cost factor, controls how much time is needed to calculate a single BCrypt hash
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   async authenticate(
     data: SignInCredentials,
   ): Promise<{ status: number; message: string; user?: UserToFrontEnd }> {
@@ -23,28 +26,38 @@ export class AuthService {
       const users = await query(sql, [email]);
 
       // Check if the user exists
-      if (users.length) {
-        // Get the user
-        const user = users[0];
-
-        // Compare hashed password using bcrypt
-        const match = await bcrypt.compare(password, user.password_hash);
-
-        // If the password matches, then return the user information
-        if (match) {
-          return { status: 200, message: 'Successful', user: user };
-        } else {
-          return {
-            status: 401,
-            message: 'Cannot login with these credentials',
-          };
-        }
-      } else {
-        return { status: 401, message: 'Cannot login with these credentials' };
+      if (!users.length) {
+        return {
+          status: HttpStatusCode.UNAUTHORIZED,
+          message: 'Cannot login with these credentials',
+        };
       }
+
+      // Get the user
+      const user = users[0];
+
+      // Compare hashed password using bcrypt
+      const match = await bcrypt.compare(password, user.password_hash);
+
+      // If the password matches, then return the user information
+      if (!match) {
+        return {
+          status: HttpStatusCode.UNAUTHORIZED,
+          message: 'Cannot login with these credentials',
+        };
+      }
+
+      return {
+        status: HttpStatusCode.OK,
+        message: 'Successful',
+        user: user,
+      };
     } catch (error) {
-      console.log(error);
-      return { status: 500, message: 'Internal Server Error' };
+      this.logger.fatal(error);
+      return {
+        status: HttpStatusCode.INTERNAL_SERVER_ERROR,
+        message: 'Internal Server Error',
+      };
     }
   }
 
@@ -58,11 +71,14 @@ export class AuthService {
 
       // If user already exists, return an appropriate response
       if (users.length > 0) {
-        return { status: 401, message: 'Email already exists' };
+        return {
+          status: HttpStatusCode.UNAUTHORIZED,
+          message: 'Email already exists',
+        };
       }
 
       // Hashing the password before storing it in the database
-      const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+      const hashedPassword = await bcrypt.hash(user.password, SALT_ROUNDS);
 
       // SQL query to insert the new user into the database
       const insertSql =
@@ -75,30 +91,24 @@ export class AuthService {
         new Date().toISOString(),
       ]);
 
-      // Checking if the user was successfully added
-      if (result.affectedRows > 0) {
-        // Constructing user object to return, excluding the password
-        const newUser = {
-          user_id: result.user_id,
-          username: user.username,
-          email: user.email,
-          full_name: user.full_name,
-          bio: user.bio,
-          profile_picture_url: user.profile_picture_url,
-          created_at: new Date().toISOString(),
-        };
-        return {
-          status: 200,
-          message: 'User added successfully',
-          user: newUser,
-        };
-      } else {
-        // Handling failure to add user
-        return { status: 400, message: 'Failed to add user' };
-      }
+      // Constructing user object to return, excluding the password
+      const newUser = {
+        user_id: result.user_id,
+        username: user.username,
+        email: user.email,
+        full_name: user.full_name,
+        bio: user.bio,
+        profile_picture_url: user.profile_picture_url,
+        created_at: new Date().toISOString(),
+      };
+      return {
+        status: HttpStatusCode.OK,
+        message: 'User added successfully',
+        user: newUser,
+      };
     } catch (error) {
       // Logging and throwing error to be handled by the controller
-      console.error(error);
+      this.logger.fatal(error);
       throw new Error('Database query failed');
     }
   }

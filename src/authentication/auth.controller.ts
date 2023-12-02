@@ -1,11 +1,15 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { SignInCredentials, SignUpUserInfo } from 'src/types/auth.types';
 import { AuthService } from './auth.service';
+import { HttpStatusCode } from '../types/http.types';
+import { AppController } from '../app.controller';
+import * as http from 'http';
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AppController.name);
   constructor(private authService: AuthService) {}
 
   @Post('authenticate')
@@ -16,35 +20,41 @@ export class AuthController {
     try {
       // Check if the user is empty
       if (!user) {
-        return res.status(400).json({ message: 'Missing Data' });
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json({ message: 'Missing Data' });
       }
 
       // Call the authService's authenticate function.
       const result = await this.authService.authenticate(user);
 
-      if (result.status === 200) {
-        // Generate the JWT token.
-        let token;
-        try {
-          token = jwt.sign(
-            { user_id: result.user!.user_id },
-            process.env.SECRET_KEY,
-          );
-        } catch (tokenError) {
-          return res.status(500).json({ message: 'Error generating token' });
-        }
-
-        // Send the token and the user information back to the client-side.
-        return res
-          .status(200)
-          .json({ message: result.message, user: result.user, token: token });
-      } else {
+      if (result.status !== HttpStatusCode.OK) {
         return res.status(result.status).json({ message: result.message });
       }
+
+      // Generate the JWT token.
+      let token: string;
+      try {
+        token = jwt.sign(
+          { user_id: result.user!.user_id },
+          process.env.SECRET_KEY,
+        );
+      } catch (tokenError) {
+        return res
+          .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+          .json({ message: 'Error generating token' });
+      }
+
+      // Send the token and the user information back to the client-side.
+      return res
+        .status(HttpStatusCode.OK)
+        .json({ message: result.message, user: result.user, token: token });
     } catch (error) {
       // Log the error
-      console.error(error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      this.logger.fatal(error);
+      return res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Internal Server Error' });
     }
   }
 
@@ -57,14 +67,16 @@ export class AuthController {
       // Validate the presence of user data
       if (!user) {
         // Respond with a Bad Request status if user data is missing
-        return res.status(400).json({ message: 'Missing Data' });
+        return res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .json({ message: 'Missing Data' });
       }
 
       // Calling the addUser function from authService
       const result = await this.authService.addUser(user);
 
       // Check if user creation is successful
-      if (result.status === 200) {
+      if (result.status === HttpStatusCode.OK) {
         let token;
         try {
           // Generating JWT token
@@ -74,12 +86,14 @@ export class AuthController {
           );
         } catch (tokenError) {
           // Handling token generation errors
-          return res.status(500).json({ message: 'Error generating token' });
+          return res
+            .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Error generating token' });
         }
 
         // Sending the success response with token and user data
         return res
-          .status(200)
+          .status(HttpStatusCode.OK)
           .json({ message: result.message, user: result.user, token: token });
       } else {
         // Handling other types of user creation failures
@@ -87,8 +101,10 @@ export class AuthController {
       }
     } catch (error) {
       // Log the error
-      console.error(error);
-      return res.status(500).json({ message: 'Internal server error' });
+      this.logger.fatal(error);
+      return res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Internal server error' });
     }
   }
 }

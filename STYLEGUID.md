@@ -153,6 +153,23 @@ export class TasksService {
 }
 ```
 
+### 8 - DO use the enum defined in http.types.ts for status codes
+
+```typescript
+// This is bad!
+
+if (message.status === 200) {
+
+}
+
+// This is good!
+
+import { HttpStatusCode } from "./http.types";
+if (message.status === HttpStatusCode.OK) {
+  
+}
+```
+
 ---
 
 # References
