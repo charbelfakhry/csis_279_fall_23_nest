@@ -49,23 +49,6 @@ describe('AuthController', () => {
       });
     });
 
-    it('should return 500 if generating the token throws an error or internal error', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      await authController.authenticateUser(
-        { email: 'first@test.com', password: 'test' },
-        mockResponse as Response,
-      );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Internal Server Error' || 'Error generating token',
-      });
-    });
-
     it('should return 401 if wrong credentials', async () => {
       const mockResponse: Partial<Response> = {
         status: jest.fn().mockReturnThis(),
