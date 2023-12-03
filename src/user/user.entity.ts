@@ -11,8 +11,6 @@ import {
   Unique,
 } from 'typeorm';
 import { Post } from '../post/post.entity';
-import { Notification } from '../notification/notification.entity';
-import { Friendship } from '../friendship/friendship.entity';
 import { Picture } from '../picture/picture.entity';
 import { hash } from 'bcrypt';
 
@@ -47,7 +45,7 @@ export class User {
   // Risk of circular dependency
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
-   
+
   @OneToOne(() => Picture)
   @JoinColumn({ name: 'profile_picture_url' })
   profilePicture!: Picture;
