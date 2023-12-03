@@ -16,7 +16,7 @@ export class NotificationController {
 
   @Post(':userId')
   async createNotification(
-    @Param('userId') userId: number,
+    @Param('userId') userId: string,
     @Body() createNotificationDto: CreateNotificationDto,
   ) {
     const notification = await this.notificationsService.createNotification(
@@ -33,7 +33,7 @@ export class NotificationController {
   }
 
   @Get(':id')
-  async getNotification(@Param('id') id: number) {
+  async getNotification(@Param('id') id: string) {
     const notification =
       await this.notificationsService.getNotificationById(id);
     return { notification };
@@ -41,7 +41,7 @@ export class NotificationController {
 
   @Put(':id')
   async updateNotification(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateNotificationDto: CreateNotificationDto,
   ) {
     const updatedNotification =
@@ -53,7 +53,7 @@ export class NotificationController {
   }
 
   @Delete(':id')
-  async deleteNotification(@Param('id') id: number) {
+  async deleteNotification(@Param('id') id: string) {
     await this.notificationsService.deleteNotification(id);
     return { message: 'Notification deleted successfully' };
   }

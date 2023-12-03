@@ -13,6 +13,18 @@ export class NotificationService {
     private userRepository: Repository<User>,
   ) {}
 
+  async getNotificationById(notificationId: string): Promise<Notification> {
+    const notification = await this.notificationRepository.findOne({
+      where: { notification_id: notificationId },
+    });
+
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+
+    return notification;
+  }
+
   async createNotification(
     userId: string,
     createNotificationDto: CreateNotificationDto,
