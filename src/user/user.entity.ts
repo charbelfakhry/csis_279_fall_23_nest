@@ -13,6 +13,8 @@ import {
 import { Post } from '../post/post.entity';
 import { Picture } from '../picture/picture.entity';
 import { hash } from 'bcrypt';
+import { Friendship } from '../friendship/friendship.entity';
+import { Notification } from '../notification/notification.entity';
 
 @Entity('users')
 @Unique(['username', 'email'])
@@ -45,6 +47,16 @@ export class User {
   // Risk of circular dependency
   @OneToMany(() => Post, (post) => post.user)
   posts!: Post[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications!: Notification[];
+  // I am not sure if friendship1 means followed and friendship2 means following
+  // or if it is mutual where we should have only one array stating if there is
+  // a friendship between the two users or not
+  @OneToMany(() => Friendship, (friendship) => friendship.user1)
+  friendships1!: Friendship[];
+  @OneToMany(() => Friendship, (friendship) => friendship.user2)
+  friendships2!: Friendship[];
 
   @OneToOne(() => Picture)
   @JoinColumn({ name: 'profile_picture_url' })
