@@ -5,10 +5,18 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { cwd } from 'node:process';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class PictureService {
   private readonly logger = new Logger(PictureService.name);
+
+  constructor(
+    @Inject('PICTURE_REPOSITORY')
+    private pictureRepository: Repository<Picture>,
+    @Inject('USER_REPOSITORY')
+    private userRepository: Repository<User>,
+  ) {}
 
   /**
    * This function is called once a day at midnight, logs a debug message stating that it's deleting unused images,
@@ -32,12 +40,22 @@ export class PictureService {
     }
   }
 
-  constructor(
-    @Inject('PICTURE_REPOSITORY')
-    private pictureRepository: Repository<Picture>,
-  ) {}
-
-  generateDefaultProfilePicture() {}
+  /**
+   * Changes the profile picture of the user object passed in and returns it, updates the user on the database and
+   * then returns the user.
+   *
+   * @param url the image name
+   * @param user the user
+   * @return the user object passed in but modified
+   */
+  async changeProfilePictureOfUser(url: string, user: User): Promise<User> {
+    const newPic = this.pictureRepository.create();
+    newPic.picture_url = url;
+    await this.pictureRepository.save(newPic);
+    user.profilePicture = newPic;
+    await this.userRepository.save(user);
+    return user;
+  }
 
   /**
    * This function is an example of how to use the repository in a service.
