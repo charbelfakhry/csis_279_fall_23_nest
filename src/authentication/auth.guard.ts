@@ -2,12 +2,12 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { SetMetadata } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
 
 /**
  * Name of the meta-data entry for the no-auth decorator.
