@@ -1,21 +1,3 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
-
-@Injectable()
-export class UserService {
-  constructor(
-    @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
-  ) {}
-
-  /**
-   * This function is an example of how to use the repository in a service.
-   */
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
-  }
-}
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -34,6 +16,16 @@ export class UserService {
    */
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
+  }
+
+  /**
+   * @param email email of the user to get.
+   * @returns User instance if found, or null otherwise.
+   */
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOneBy({
+      email: email,
+    });
   }
 
   /**
