@@ -5,14 +5,17 @@ import {
   HttpException,
   HttpStatus,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { hash } from 'bcrypt';
+import { compare } from 'bcrypt';
+import * as process from 'process';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
@@ -44,15 +47,13 @@ export class AuthService {
       throw new NotFoundException('User does not exist');
     }
 
-    /* stores the hashed raw-password */
-    let hashed_pass: string;
+    /* stores pass and hashed pass comparison */
+    let correct: boolean;
 
     try {
-      /* Hash the given password
-       * TODO write a common hash function in the UserService & use it here.
-       * */
-      hashed_pass = await hash(pass, 15);
+      correct = await compare(pass, user.password_hash);
     } catch (e) {
+      this.logger.fatal(e);
       throw new HttpException(
         'Internal Server Error',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -60,7 +61,7 @@ export class AuthService {
     }
 
     /* Check for mismatch */
-    if (user.password_hash !== hashed_pass) {
+    if (!correct) {
       /* status code is 401 */
       throw new UnauthorizedException('Cannot login with these credentials');
     }
@@ -70,7 +71,9 @@ export class AuthService {
 
     /* status code defined in controller */
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, {
+        expiresIn: Date.now() + parseInt(process.env.JWT_DURATION),
+      }),
     };
   }
 
@@ -78,9 +81,6 @@ export class AuthService {
    * @param username
    * @param email
    * @param pass
-   * @param full_name
-   * @param bio
-   * @param pfl_pic_url profile picture url.
    * @returns an object containing a user token valid for
    *          the duration specified in the environment.
    * @throws UnauthorizedException if username is not unique or if email is not unique.
@@ -91,19 +91,16 @@ export class AuthService {
     username: string,
     email: string,
     pass: string,
-    full_name: string,
-    bio: string,
-    pfl_pic_url: string,
   ): Promise<{ access_token: string }> {
     /* check for missing data */
-    if (!username || !email || !pass || !full_name || !bio || !pfl_pic_url) {
+    if (!email || !pass) {
       /* status code is 400 */
       throw new BadRequestException('Missing Data');
     }
 
     /* check if the email is in use.
      * Note that this check is not necessary,
-     * but this is the only way to know wehther the username is taken,
+     * but this is the only way to know whether the username is taken,
      * or email.
      *  */
     const usernameUser: User | null =
@@ -126,17 +123,15 @@ export class AuthService {
 
     try {
       /* try to create user */
-      const user: User = await this.userService.createUser({
-        username: username,
-        email: email,
-        password_hash: pass,
-        full_name: full_name,
-        bio: bio,
-        profile_picture_url: pfl_pic_url,
-      });
+      const user: User = await this.userService.createUserRequired(
+        username,
+        email,
+        pass,
+      );
 
       return await this.signIn(user.email, pass);
     } catch (e) {
+      this.logger.fatal(e);
       throw new HttpException(
         'Internal Server Error',
         HttpStatus.INTERNAL_SERVER_ERROR,

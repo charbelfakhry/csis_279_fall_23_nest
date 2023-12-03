@@ -66,20 +66,25 @@ export class UserService {
    * @param username
    * @returns Promise<User>
    */
-  async findOneByUsername(username: string): Promise<User> {
+  async findOneByUsername(username: string): Promise<User | null> {
     //search for the user
-    const foundUser = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { username },
     });
+  }
 
-    //check if the user was found
-    if (!foundUser) {
-      throw new NotFoundException(
-        `User with username: ${username} was not found`,
-      );
-    }
+  async createUserRequired(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<User> {
+    const newUser = this.userRepository.create({
+      username,
+      email,
+      password_hash: password,
+    });
 
-    return foundUser;
+    return this.userRepository.save(newUser);
   }
 
   /**

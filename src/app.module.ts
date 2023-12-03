@@ -11,6 +11,7 @@ import { FriendshipModule } from './friendship/friendship.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtMiddleware } from './middleware/token.middleware';
 import { JwtService } from '@nestjs/jwt';
+import { AuthModule } from './authentication/auth.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { JwtService } from '@nestjs/jwt';
     LikeModule,
     CommentModule,
     FriendshipModule,
+    AuthModule,
   ],
   providers: [JwtService],
 })
@@ -38,7 +40,7 @@ export class AppModule {
       .apply(JwtMiddleware)
       .exclude(
         { path: 'auth/login', method: RequestMethod.POST },
-        { path: 'auth/signup', method: RequestMethod.POST },
+        { path: 'auth/register', method: RequestMethod.POST },
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }

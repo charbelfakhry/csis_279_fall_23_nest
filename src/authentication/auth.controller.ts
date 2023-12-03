@@ -77,9 +77,6 @@ export class AuthController {
       registerDto?.username,
       registerDto?.email,
       registerDto?.password,
-      registerDto?.full_name,
-      registerDto?.bio,
-      registerDto?.profile_picture_url,
     );
 
     /* pass result to response */

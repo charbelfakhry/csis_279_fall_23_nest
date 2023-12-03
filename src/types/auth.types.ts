@@ -2,9 +2,6 @@ export type SignUpUserInfo = {
   username: string;
   email: string;
   password: string;
-  full_name: string;
-  bio: string;
-  profile_picture_url: string;
 };
 
 export type SignInCredentials = {
