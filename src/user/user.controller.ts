@@ -6,9 +6,14 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { RequestWithUser } from '../middleware/token.middleware';
 
 @Controller('users')
 export class UserController {
@@ -41,6 +46,16 @@ export class UserController {
   @Put()
   async updateUser(@Body() id: string, @Body() user: UpdateUserDto) {
     return this.userService.updateUser(id, user);
+  }
+
+  @Put('profile')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }]))
+  async changeProfileImage(
+    @UploadedFiles() file: { avatar?: Express.Multer.File[] },
+    @Req() req: RequestWithUser,
+  ) {
+    const user = req.user;
+    console.log(file, user);
   }
 
   @Delete('/:id')

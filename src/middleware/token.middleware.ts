@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/user.entity';
 
 // And interface that allows the request to have a user property.
-interface RequestWithUser extends Request {
+export interface RequestWithUser extends Request {
   user: User;
 }
 
