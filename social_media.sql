@@ -23,8 +23,10 @@ CREATE TABLE IF NOT EXISTS posts (
     post_id BINARY(16) DEFAULT (UUID_TO_BIN(UUID())) not null PRIMARY KEY,
     user_id BINARY(16),
     content TEXT NOT NULL,
+    post_picture_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (post_picture_url) REFERENCES pictures(picture_url)
 );
 
 

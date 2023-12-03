@@ -4,11 +4,13 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
+  OneToOne,
   JoinColumn,
   OneToMany,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Like } from '../like/like.entity';
+import { Picture } from '../picture/picture.entity';
 import { Comment } from '../comment/comment.entity';
 
 @Entity('posts')
@@ -25,6 +27,10 @@ export class Post {
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
+
+  @OneToOne(() => Picture)
+  @JoinColumn({ name: 'post_picture_url' })
+  postPicture!: Picture;
 
   // Reverse association
   // Risk of circular dependency
