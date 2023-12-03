@@ -9,7 +9,6 @@ export class PostService {
     private postRepository: Repository<Post>,
   ) {}
 
-
   /**
    * This function is an example of how to use the repository in a service.
    */
