@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { LikeService } from '../like/like.service';
 import { PostService } from './post.service';
+import { RequestWithUser } from 'src/middleware/token.middleware';
 
 
 @Controller('posts')
@@ -33,14 +34,14 @@ export class PostController {
 
   @Post(':postId/likes')
   async likePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
-    // const user = 
+    const user = req.user;
     const like = await this.likeService.likePost(user, postId);
     return { like };
   }
 
   @Delete(':postId/likes')
-  async unlikePost(@Param('postId') postId: string) {
-    // const user = 
+  async unlikePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
+    const user = req.user;
     const unlike = await this.likeService.unlikePost(user, postId);
     return { unlike };
   }

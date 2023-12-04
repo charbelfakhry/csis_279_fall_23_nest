@@ -17,23 +17,23 @@ export class CommentController {
 
    // Likes:
 
-   @Get(':commentId/likes')
-   async getLikesForComment(@Param('commentId') commentId: string) {
-     const likes = await this.likeService.findLikesForComment(commentId);
-     return { likes };
-   }
+  //  @Get(':commentId/likes')
+  //  async getLikesForComment(@Param('commentId') commentId: string) {
+  //    const likes = await this.likeService.findLikesForComment(commentId);
+  //    return { likes };
+  //  }
  
-   @Post(':commentId/likes')
-   async likeComment(@Param('commentId') commentId: string) {
-     const like = await this.likeService.likeComment(commentId);
-     return { like };
-   }
+  //  @Post(':commentId/likes')
+  //  async likeComment(@Param('commentId') commentId: string) {
+  //    const like = await this.likeService.likeComment(commentId);
+  //    return { like };
+  //  }
  
-   @Delete(':commentId/likes')
-   async unlikeComment(@Param('commentId') commentId: string) {
-     const unlike = await this.likeService.unlikeComment(commentId);
-     return { unlike };
-   }
+  //  @Delete(':commentId/likes')
+  //  async unlikeComment(@Param('commentId') commentId: string) {
+  //    const unlike = await this.likeService.unlikeComment(commentId);
+  //    return { unlike };
+  //  }
 }
 
  
