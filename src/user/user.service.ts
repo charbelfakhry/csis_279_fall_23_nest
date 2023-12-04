@@ -19,6 +19,16 @@ export class UserService {
   }
 
   /**
+   * @param email email of the user to get.
+   * @returns User instance if found, or null otherwise.
+   */
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOneBy({
+      email: email,
+    });
+  }
+
+  /**
    * Finds all the users by username. Users that match the username or that have the username included
    * in their username are counted.
    * @param username
@@ -56,20 +66,25 @@ export class UserService {
    * @param username
    * @returns Promise<User>
    */
-  async findOneByUsername(username: string): Promise<User> {
+  async findOneByUsername(username: string): Promise<User | null> {
     //search for the user
-    const foundUser = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { username },
     });
+  }
 
-    //check if the user was found
-    if (!foundUser) {
-      throw new NotFoundException(
-        `User with username: ${username} was not found`,
-      );
-    }
+  async createUserRequired(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<User> {
+    const newUser = this.userRepository.create({
+      username,
+      email,
+      password_hash: password,
+    });
 
-    return foundUser;
+    return this.userRepository.save(newUser);
   }
 
   /**

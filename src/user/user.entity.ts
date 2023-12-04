@@ -5,10 +5,10 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
   JoinColumn,
   OneToOne,
   Unique,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Post } from '../post/post.entity';
 import { Picture } from '../picture/picture.entity';
@@ -22,22 +22,22 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   user_id!: string;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
-  @Column()
+  @Column({ nullable: false, unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   password_hash: string;
 
-  @Column()
+  @Column({ default: '' })
   full_name: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text', default: '' })
   bio: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: 'defaultProfile.png' })
   profile_picture_url: string;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -1,151 +1,109 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
-import { AuthController } from '../src/authentication/auth.controller';
+import * as request from 'supertest';
 import { AuthModule } from '../src/authentication/auth.module';
 
-describe('AuthController', () => {
-  let authController: AuthController;
+describe('AuthController (e2e)', () => {
+  let app: any;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AuthModule],
     }).compile();
 
-    authController = module.get<AuthController>(AuthController);
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
-  describe('authenticateUser', () => {
-    it('should return 200 if user is correctly authenticated', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      await authController.authenticateUser(
-        {
-          email: 'first@test.com',
-          password: 'test',
-        },
-        mockResponse as Response,
-      );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Successful',
-      });
-    });
-
-    it('should return 400 if user data is missing', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      await authController.authenticateUser(null, mockResponse as Response);
-
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Missing Data',
-      });
-    });
-
-    it('should return 500 if generating the token throws an error or internal error', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      await authController.authenticateUser(
-        { email: 'first@test.com', password: 'test' },
-        mockResponse as Response,
-      );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Internal Server Error' || 'Error generating token',
-      });
-    });
-
-    it('should return 401 if wrong credentials', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
-
-      await authController.authenticateUser(
-        { email: 'first@test.com', password: 'password' },
-        mockResponse as Response,
-      );
-
-      expect(mockResponse.status).toHaveBeenCalledWith(401);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Cannot login with these credentials',
-      });
-    });
+  afterAll(async () => {
+    await app.close();
   });
 
-  describe('addUser', () => {
-    it('should return 400 if user data is missing', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+  it('/auth/login (POST) - should authenticate user and return token', async () => {
+    const signInCredentials = {
+      email: 'test@test.com',
+      password: 'testtest',
+    };
 
-      await authController.addUser(null, mockResponse as Response);
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send(signInCredentials)
+      .expect(200);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Missing Data',
-      });
-    });
+    expect(response.body.message).toBe('Success');
+    expect(response.body.access_token).toBeDefined();
+  });
 
-    it('should return 500 if bcrypt.hash throws an error or internal error', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+  it('/auth/login (POST) - should handle no user errors', async () => {
+    const signInCredentials = {
+      email: 'nonexistent@example.com',
+      password: 'password123',
+    };
 
-      await authController.addUser(
-        {
-          username: 'test',
-          email: 'test@example.com',
-          password: 'password',
-          full_name: 'test',
-          bio: 'test',
-          profile_picture_url: 'test',
-          created_at: 'test',
-        },
-        mockResponse as Response,
-      );
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send(signInCredentials)
+      .expect(404);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Internal Server Error' || 'Error generating token',
-      });
-    });
+    expect(response.body.message).toBe('User does not exist');
+  });
 
-    it('should return 401 if user already exists', async () => {
-      const mockResponse: Partial<Response> = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      };
+  it('/auth/login (POST) - should handle wrong password errors', async () => {
+    const signInCredentials = {
+      email: 'test@test.com',
+      password: 'wrongpassword',
+    };
 
-      await authController.addUser(
-        {
-          username: 'firstTest',
-          email: 'first@test.com',
-          password: 'test',
-          full_name: 'Fist Test',
-          bio: 'This is the first test',
-          profile_picture_url: 'https://www.google.com',
-          created_at: '2021-09-29 00:00:00',
-        },
-        mockResponse as Response,
-      );
-      expect(mockResponse.status).toHaveBeenCalledWith(401);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Email already exists',
-      });
-    });
+    const response = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send(signInCredentials)
+      .expect(401);
+
+    expect(response.body.message).toBe('Cannot login with these credentials');
+  });
+
+  it('/auth/register (POST) - should register user and return token', async () => {
+    const signUpUserInfo = {
+      username: 'test4',
+      email: 'test1@test4.com',
+      password: 'password123',
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(signUpUserInfo)
+      .expect(200);
+
+    expect(response.body.message).toBe('Success');
+    expect(response.body.access_token).toBeDefined();
+  });
+
+  it('/auth/register (POST) - should handle username exists errors', async () => {
+    const signUpUserInfo = {
+      username: 'test',
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(signUpUserInfo)
+      .expect(401);
+
+    expect(response.body.message).toBe('Username exists');
+  });
+
+  it('/auth/register (POST) - should handle email exists errors', async () => {
+    const signUpUserInfo = {
+      username: 'newuser',
+      email: 'test@test.com',
+      password: 'password123',
+    };
+
+    const response = await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(signUpUserInfo)
+      .expect(401);
+
+    expect(response.body.message).toBe('Email exists');
   });
 });
