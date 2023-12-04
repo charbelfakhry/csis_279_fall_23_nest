@@ -1,32 +1,26 @@
-/**************************************************************************************
- * File: user.dto.ts
- * Author: Tony Hallal
- * Date: 12/3/2023
- * Description: Contains all user data transfer objects: CreateUserDto, UpdateUserDto,
- * AuthUserDto, GetUserDto.
- ***************************************************************************************/
-
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
+import { IsLengthAndNoSpecialChars } from '../decorators/check.length.chars';
 
 /**
  * DTO class for user creation
  */
 export class CreateUserDto {
-  @IsNotEmpty()
-  username: string;
+  @IsLengthAndNoSpecialChars(4, 20)
+  username?: string;
 
   @IsEmail()
   email: string;
 
-  @IsNotEmpty()
   @IsStrongPassword()
   password_hash: string;
 
-  @IsNotEmpty()
+  @IsLengthAndNoSpecialChars(4, 30)
   full_name: string;
 
+  @IsLengthAndNoSpecialChars(1, 200)
   bio?: string;
 
+  @IsNotEmpty()
   profile_picture_url?: string;
 
   constructor(
@@ -50,6 +44,7 @@ export class CreateUserDto {
  * Dto class for user update
  */
 export class UpdateUserDto {
+  @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
 
   @IsEmail()
@@ -58,8 +53,10 @@ export class UpdateUserDto {
   @IsStrongPassword()
   password_hash?: string;
 
+  @IsLengthAndNoSpecialChars(4, 30)
   full_name?: string;
 
+  @IsLengthAndNoSpecialChars(1, 200)
   bio?: string;
 
   profile_picture_url?: string;
@@ -85,7 +82,7 @@ export class UpdateUserDto {
  * DTO class for user authentication
  */
 export class AuthUserDto {
-  @IsNotEmpty()
+  @IsLengthAndNoSpecialChars(4, 20)
   username: string;
 
   @IsNotEmpty()

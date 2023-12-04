@@ -30,6 +30,7 @@ export class LikeService {
     });
     if (!post) {
       throw new Error('Post not found');
+      //NotFoundException
     }
     const like = this.likeRepository.create({ user, post });
     await this.likeRepository.save(like);

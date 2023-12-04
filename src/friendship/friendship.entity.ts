@@ -1,25 +1,34 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 
+/*
+ * Here, the frienship model represents a user following another.
+ * It is not mutual, which means the order matters; one user following another
+ * doesn't necessitate that the latter is following the former.
+ */
 @Entity('friendships')
 export class Friendship {
   @PrimaryGeneratedColumn('uuid')
   friendship_id!: string;
 
+  // follower
+  // user_id1 in the database
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id' })
-  user1: User; // follower
+  @JoinColumn({ name: 'user_id1' })
+  follower: User;
 
+  // followed
+  // user_id2 in the database
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id' })
-  user2: User; // followed
+  @JoinColumn({ name: 'user_id2' })
+  following: User;
 
   @Column({ type: 'text', nullable: false })
   status: string;
@@ -27,9 +36,9 @@ export class Friendship {
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  constructor(user1: User, user2: User, status: string) {
-    this.user1 = user1;
-    this.user2 = user2;
+  constructor(follower: User, following: User, status: string) {
+    this.follower = follower;
+    this.following = following;
     this.status = status;
   }
 }

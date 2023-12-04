@@ -1,11 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { Picture } from './picture.entity';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import * as path from 'path';
 import * as fs from 'fs/promises';
 import { cwd } from 'node:process';
-import { User } from '../user/user.entity';
+import * as path from 'path';
+import { Repository } from 'typeorm';
+import { Picture } from './picture.entity';
 
 @Injectable()
 export class PictureService {
@@ -14,8 +13,6 @@ export class PictureService {
   constructor(
     @Inject('PICTURE_REPOSITORY')
     private pictureRepository: Repository<Picture>,
-    @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
   ) {}
 
   /**
@@ -41,26 +38,19 @@ export class PictureService {
   }
 
   /**
-   * Changes the profile picture of the user object passed in and returns it, updates the user on the database and
-   * then returns the user.
-   *
-   * @param url the image name
-   * @param user the user
-   * @return the user object passed in but modified
-   */
-  async changeProfilePictureOfUser(url: string, user: User): Promise<User> {
-    const newPic = this.pictureRepository.create();
-    newPic.picture_url = url;
-    await this.pictureRepository.save(newPic);
-    user.profilePicture = newPic;
-    await this.userRepository.save(user);
-    return user;
-  }
-
-  /**
    * This function is an example of how to use the repository in a service.
    */
   async findAll(): Promise<Picture[]> {
     return this.pictureRepository.find();
+  }
+
+  /**
+   * Inserts a new image in the database and returns it.
+   * @param filename
+   */
+  async insertPicture(filename: string) {
+    const pic = this.pictureRepository.create({ picture_url: filename });
+    await this.pictureRepository.save(pic);
+    return pic;
   }
 }

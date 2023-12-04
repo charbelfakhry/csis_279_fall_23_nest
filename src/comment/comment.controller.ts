@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Delete, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { LikeService } from '../like/like.service';
+// import { Post } from 'src/post/post.entity';
+import { CreateCommentDto } from './comment.dto';
 
 @Controller('comments')
 export class CommentController {
@@ -8,6 +10,16 @@ export class CommentController {
     private readonly commentService: CommentService, 
     private readonly likeService: LikeService,
   ) {}
+
+  @Get('comment/:postId')
+  async getCommentByPost(postId: string) {
+    return this.commentService.findCommentByPost(postId);
+  }
+
+  @Post()
+  async addComment(@Body() comment: CreateCommentDto) {
+    return this.commentService.createComment(comment);
+  }
 
   @Get('/')
   async getAll() {
@@ -36,4 +48,3 @@ export class CommentController {
   //  }
 }
 
- 

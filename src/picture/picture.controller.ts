@@ -6,8 +6,8 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { PictureService } from './picture.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { PictureService } from './picture.service';
 
 @Controller('pictures')
 export class PictureController {
