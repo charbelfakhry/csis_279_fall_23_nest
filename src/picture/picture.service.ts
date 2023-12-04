@@ -63,4 +63,14 @@ export class PictureService {
   async findAll(): Promise<Picture[]> {
     return this.pictureRepository.find();
   }
+
+  /**
+   * Inserts a new image in the database and returns it.
+   * @param filename
+   */
+  async insertPicture(filename: string) {
+    const pic = this.pictureRepository.create({ picture_url: filename });
+    await this.pictureRepository.save(pic);
+    return pic;
+  }
 }
