@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { Post } from './post.entity';
 import { CreatePostRequestDTO } from './post.dto';
 import { User } from 'src/user/user.entity';
+import { Picture } from '../picture/picture.entity';
 
 @Injectable()
 export class PostService {
@@ -44,13 +45,19 @@ export class PostService {
    * Create a new post
    * @param postData - Partial Post entity data
    * @param user
+   * @param postImage
    * @returns Newly created Post entity
    */
   async createPost(
     postData: Partial<CreatePostRequestDTO>,
     user: User,
+    postImage: Picture,
   ): Promise<Post> {
-    const newPost = this.postRepository.create({ ...postData, user });
+    const newPost = this.postRepository.create({
+      ...postData,
+      user,
+      postPicture: postImage,
+    });
     return this.postRepository.save(newPost);
   }
 
@@ -64,7 +71,7 @@ export class PostService {
   async updatePost(
     post_id: string,
     user: User,
-    updateData: Partial<Post>,
+    updateData: Partial<Omit<CreatePostRequestDTO, 'picture'>>,
   ): Promise<Post> {
     const postToUpdate = await this.postRepository.findOne({
       where: { post_id, user: { user_id: user.user_id } },

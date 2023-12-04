@@ -2,7 +2,7 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './comment.dto';
-import {UserService} from '../user/user.service';
+import { UserService } from '../user/user.service';
 import { PostService } from 'src/post/post.service';
 
 @Injectable()
@@ -12,20 +12,22 @@ export class CommentService {
     private commentRepository: Repository<Comment>,
     private userService: UserService,
     private postService: PostService,
-  ) { }
+  ) {}
 
   /**
    * Find all the comments of a post.
-   * @param postId 
+   * @param postId
    * @returns Promise<Comment[]>
    */
   async findCommentByPost(postId: string): Promise<Comment[]> {
-    return this.commentRepository.find({ where: { post: { post_id: postId } } });
+    return this.commentRepository.find({
+      where: { post: { post_id: postId } },
+    });
   }
 
   /**
    * Create a comment on user's post.
-   * @param createCommentDto 
+   * @param createCommentDto
    * @returns Promise<Comment>
    */
   async createComment(createCommentDto: CreateCommentDto): Promise<Comment> {
@@ -40,8 +42,10 @@ export class CommentService {
     }
 
     const comment = this.commentRepository.create({
-      user, post, content
-    })
+      user,
+      post,
+      content,
+    });
 
     return this.commentRepository.save(comment);
   }
@@ -53,4 +57,3 @@ export class CommentService {
     return this.commentRepository.find();
   }
 }
-
