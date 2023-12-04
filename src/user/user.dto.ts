@@ -1,11 +1,10 @@
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
-import { IsLengthAndNoSpecialChars } from 'src/decorators/check.length.chars';
+import { IsLengthAndNoSpecialChars } from '../decorators/check.length.chars';
 
 /**
  * DTO class for user creation
  */
 export class CreateUserDto {
-
   @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
 
@@ -45,7 +44,6 @@ export class CreateUserDto {
  * Dto class for user update
  */
 export class UpdateUserDto {
-
   @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
 
@@ -84,7 +82,6 @@ export class UpdateUserDto {
  * DTO class for user authentication
  */
 export class AuthUserDto {
-
   @IsLengthAndNoSpecialChars(4, 20)
   username: string;
 
