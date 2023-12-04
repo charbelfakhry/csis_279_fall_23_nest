@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { FriendshipController } from './friendship.controller';
-import { FriendshipService } from './friendship.service';
-import { friendshipProviders } from './friendship.providers';
 import { DatabaseModule } from '../database.module';
+import { FriendshipController } from './friendship.controller';
+import { friendshipProviders } from './friendship.providers';
+import { FriendshipService } from './friendship.service';
 
 @Module({
   imports: [DatabaseModule],

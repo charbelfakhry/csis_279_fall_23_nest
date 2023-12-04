@@ -6,10 +6,10 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignInCredentials, SignUpUserInfo } from '../types/auth.types';
 import { SkipAuth } from './auth.guard';
+import { AuthService } from './auth.service';
 
 /**
  * Type alias for the response body of the authenticateUser function.

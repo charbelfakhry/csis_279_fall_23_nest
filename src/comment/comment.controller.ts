@@ -1,5 +1,5 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { CommentService } from './comment.service';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { CommentService } from '../comment/comment.service';
 // import { Post } from 'src/post/post.entity';
 import { CreateCommentDto } from './comment.dto';
 
@@ -13,7 +13,7 @@ export class CommentController {
   }
 
   @Post()
-  async addComment(comment: CreateCommentDto) {
+  async addComment(@Body() comment: CreateCommentDto) {
     return this.commentService.createComment(comment);
   }
 

@@ -1,9 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Comment } from './comment.entity';
-import { CreateCommentDto } from './comment.dto';
+import { PostService } from '../post/post.service';
 import { UserService } from '../user/user.service';
-import { PostService } from 'src/post/post.service';
+import { CreateCommentDto } from './comment.dto';
+import { Comment } from './comment.entity';
 
 @Injectable()
 export class CommentService {
