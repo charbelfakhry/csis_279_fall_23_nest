@@ -1,17 +1,17 @@
 import {
-  Injectable,
-  UnauthorizedException,
   BadRequestException,
   HttpException,
   HttpStatus,
-  NotFoundException,
+  Injectable,
   Logger,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import * as process from 'process';
+import { User } from '../user/user.entity';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +49,6 @@ export class AuthService {
 
     /* stores pass and hashed pass comparison */
     let correct: boolean;
-
     try {
       correct = await compare(pass, user.password_hash);
     } catch (e) {
@@ -59,13 +58,11 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
     /* Check for mismatch */
     if (!correct) {
       /* status code is 401 */
       throw new UnauthorizedException('Cannot login with these credentials');
     }
-
     /* payload to be added to the JWT token */
     const payload = { sub: user.user_id, email: user.email };
 
