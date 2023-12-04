@@ -1,5 +1,5 @@
 // app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { DatabaseModule } from './database.module';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
@@ -9,13 +9,13 @@ import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
 import { FriendshipModule } from './friendship/friendship.module';
 import { ThrottlerModule } from '@nestjs/throttler';
-// import { JwtMiddleware } from './middleware/token.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from './authentication/auth.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-
-console.log();
+import { JwtMiddleware } from './middleware/token.middleware';
+import { MiddlewareModule } from '@nestjs/core/middleware/middleware-module';
+import { userProviders } from './user/user.providers';
 
 @Module({
   imports: [
@@ -31,6 +31,7 @@ console.log();
         ttl: 60000,
       },
     ]),
+    MiddlewareModule,
     DatabaseModule,
     UserModule,
     PostModule,
@@ -41,17 +42,12 @@ console.log();
     FriendshipModule,
     AuthModule,
   ],
-  providers: [JwtService],
+  providers: [JwtService, ...userProviders],
 })
 export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   // consumer
-  //   //   .apply(JwtMiddleware)
-  //   //   .exclude(
-  //   //     { path: 'auth/login', method: RequestMethod.POST },
-  //   //     { path: 'auth/register', method: RequestMethod.POST },
-  //   //     { path: 'static/defaultProfile.png', method: RequestMethod.ALL },
-  //   //   )
-  //   //   .forRoutes({ path: '*', method: RequestMethod.ALL });
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtMiddleware)
+      .forRoutes({ path: '/users/profile', method: RequestMethod.PUT });
+  }
 }

@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { Picture } from '../picture/picture.entity';
 
 @Injectable()
 export class UserService {
@@ -115,5 +116,16 @@ export class UserService {
    */
   async deleteUser(id: string) {
     await this.userRepository.delete(id);
+  }
+
+  /**
+   * Updates the profile pic of a user.
+   * @param user
+   * @param pic
+   */
+  async updateProfile(user: User, pic: Picture) {
+    user.profilePicture = pic;
+    await this.userRepository.save(user);
+    return user;
   }
 }
