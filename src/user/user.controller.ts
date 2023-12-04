@@ -5,14 +5,13 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   Put,
   Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { UpdateUserDto } from './user.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from '../middleware/token.middleware';
 import { diskStorage } from 'multer';
@@ -27,28 +26,13 @@ export class UserController {
     private readonly pictureService: PictureService,
   ) {}
 
-  @Get('/')
-  async getAll() {
-    return await this.userService.findAll();
-  }
-
-  @Get('/users-by-username/:username')
-  async getUsersByUsername(@Param('username') username: string) {
-    return this.userService.findUsersByUsername(username);
-  }
-
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
     return this.userService.findOneById(id);
   }
-  @Get('/by-username/:username')
+  @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);
-  }
-
-  @Post()
-  async addUser(@Body() user: CreateUserDto) {
-    return this.userService.createUser(user);
   }
 
   @Put()

@@ -5,7 +5,6 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { cwd } from 'node:process';
-import { User } from '../user/user.entity';
 
 @Injectable()
 export class PictureService {
@@ -14,8 +13,6 @@ export class PictureService {
   constructor(
     @Inject('PICTURE_REPOSITORY')
     private pictureRepository: Repository<Picture>,
-    @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
   ) {}
 
   /**
@@ -38,23 +35,6 @@ export class PictureService {
     for (const photo of toDelete) {
       await fs.rm(path.join(PATH_TO_IMAGES, photo));
     }
-  }
-
-  /**
-   * Changes the profile picture of the user object passed in and returns it, updates the user on the database and
-   * then returns the user.
-   *
-   * @param url the image name
-   * @param user the user
-   * @return the user object passed in but modified
-   */
-  async changeProfilePictureOfUser(url: string, user: User): Promise<User> {
-    const newPic = this.pictureRepository.create();
-    newPic.picture_url = url;
-    await this.pictureRepository.save(newPic);
-    user.profilePicture = newPic;
-    await this.userRepository.save(user);
-    return user;
   }
 
   /**
