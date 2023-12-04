@@ -48,6 +48,11 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(JwtMiddleware)
-      .forRoutes({ path: '/users/profile', method: RequestMethod.PUT });
+      .forRoutes(
+        { path: '/users/profile', method: RequestMethod.PUT },
+        { path: '/posts', method: RequestMethod.POST },
+        { path: '/posts/:post_id', method: RequestMethod.DELETE },
+        { path: '/posts/:post_id', method: RequestMethod.PUT },
+      );
   }
 }

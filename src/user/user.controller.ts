@@ -19,7 +19,6 @@ import e from 'express';
 import { resolve } from 'path';
 import { PictureService } from '../picture/picture.service';
 
-
 @Controller('users')
 export class UserController {
   constructor(
@@ -31,6 +30,7 @@ export class UserController {
   async getUserById(@Param('id') id: string) {
     return this.userService.findOneById(id);
   }
+
   @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);

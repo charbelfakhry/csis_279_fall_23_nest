@@ -1,8 +1,12 @@
-import { Picture } from "src/picture/picture.entity";
+import { Picture } from 'src/picture/picture.entity';
 
-export type CreatePostDTO = {
-    content : string;
-    picture?:Picture;
+export type CreatePostRequestDTO = {
+  content: string;
+  picture?: Picture;
+};
 
-}
-
+export type CreatePostResponseDTO = {
+  content: string;
+  picture?: string;
+  post_id: string;
+};

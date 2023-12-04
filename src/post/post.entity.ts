@@ -24,8 +24,6 @@ export class Post {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-
-
   // Column for the content of the post, non-nullable text
   @Column({ type: 'text', nullable: false })
   content: string;
@@ -53,9 +51,8 @@ export class Post {
    * @param user - User who created the post
    * @param content - Content of the post
    * @param postPicture - Picture associated with the post
-   * @param user_id - ID of the user who created the post
    */
-  constructor(user: User, content: string, postPicture: Picture, user_id: string) {
+  constructor(user: User, content: string, postPicture: Picture) {
     this.user = user;
     this.content = content;
     this.postPicture = postPicture;

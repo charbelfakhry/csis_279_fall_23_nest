@@ -1,12 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostEntity } from './post.entity';
-import { request } from 'http';
 import { RequestWithUser } from 'src/middleware/token.middleware';
-import { CreatePostDTO } from './post.dto';
+import { CreatePostRequestDTO, CreatePostResponseDTO } from './post.dto';
 
 @Controller('posts')
 export class PostController {
+  private readonly logger = new Logger(PostController.name);
   constructor(private readonly postService: PostService) {}
 
   /**
@@ -31,25 +42,46 @@ export class PostController {
   /**
    * Create a new post
    * @param postData - Partial data of PostEntity
+   * @param request
    * @returns Created PostEntity object
    */
 
   @Post()
-  async createPost(@Body() postData: Partial<CreatePostDTO>, @Req() request: RequestWithUser): Promise<PostEntity> {
-    const user = request.user;
-    
-    return this.postService.createPost(postData, user);
+  async createPost(
+    @Body() postData: Partial<CreatePostRequestDTO>,
+    @Req() request: RequestWithUser,
+  ): Promise<CreatePostResponseDTO> {
+    const user = request.userEntity;
+    const post = await this.postService.createPost(postData, user);
+
+    return {
+      content: post.content,
+      picture: post.postPicture?.picture_url,
+      post_id: post.post_id,
+    };
   }
 
   /**
    * Update a post by ID
    * @param postId - ID of the post to update
    * @param updateData - Partial data of PostEntity for update
+   * @param req
    * @returns Updated PostEntity object
    */
   @Put(':post_id')
-  async updatePost(@Param('post_id') postId: string, @Body() updateData: Partial<PostEntity>): Promise<PostEntity> {
-    const updatedPost = await this.postService.updatePost(postId, updateData);
+  async updatePost(
+    @Param('post_id') postId: string,
+    @Body() updateData: Partial<CreatePostRequestDTO>,
+    @Req() req: RequestWithUser,
+  ): Promise<PostEntity> {
+    const user = req.userEntity;
+
+    const updatedPost = await this.postService.updatePost(
+      postId,
+      user,
+      updateData,
+    );
+
     if (!updatedPost) {
       throw new NotFoundException('Post not found');
     }
@@ -59,17 +91,21 @@ export class PostController {
   /**
    * Delete a post by ID
    * @param postId - ID of the post to delete
+   * @param request
    */
   @Delete(':post_id')
-  async deletePost(@Param('post_id') postId: string, @Req() request: RequestWithUser): Promise<void> {
-    const user = request.user;
+  async deletePost(
+    @Param('post_id') postId: string,
+    @Req() request: RequestWithUser,
+  ): Promise<void> {
+    const user = request.userEntity;
     try {
       await this.postService.deletePost(postId, user);
     } catch (error) {
+      this.logger.fatal(error);
       throw new NotFoundException('Post not found');
     }
   }
-
 
   /**
    * Get posts by user name
@@ -77,7 +113,9 @@ export class PostController {
    * @returns Array of PostEntity objects
    */
   @Get('user/:userName')
-  async findPostsByUserName(@Param('userName') userName: string): Promise<PostEntity[]> {
+  async findPostsByUserName(
+    @Param('userName') userName: string,
+  ): Promise<PostEntity[]> {
     const posts = await this.postService.findPostsByUserName(userName);
     if (!posts || posts.length === 0) {
       throw new NotFoundException('No posts found for this user name');
