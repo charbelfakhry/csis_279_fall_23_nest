@@ -5,7 +5,7 @@ import { CreateCommentDto } from './comment.dto';
 
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) { }
+  constructor(private readonly commentService: CommentService) {}
 
   @Get('comment/:postId')
   async getCommentByPost(postId: string) {

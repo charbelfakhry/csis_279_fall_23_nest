@@ -1,17 +1,17 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  OneToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity';
+import { Comment } from '../comment/comment.entity';
 import { Like } from '../like/like.entity';
 import { Picture } from '../picture/picture.entity';
-import { Comment } from '../comment/comment.entity';
+import { User } from '../user/user.entity';
 
 @Entity('posts')
 export class Post {
@@ -23,8 +23,6 @@ export class Post {
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
-
-
 
   // Column for the content of the post, non-nullable text
   @Column({ type: 'text', nullable: false })
@@ -55,7 +53,7 @@ export class Post {
    * @param postPicture - Picture associated with the post
    * @param user_id - ID of the user who created the post
    */
-  constructor(user: User, content: string, postPicture: Picture, user_id: string) {
+  constructor(user: User, content: string, postPicture: Picture) {
     this.user = user;
     this.content = content;
     this.postPicture = postPicture;
