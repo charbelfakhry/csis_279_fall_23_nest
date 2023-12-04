@@ -7,9 +7,9 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { SignInCredentials, SignUpUserInfo } from '../types/auth.types';
 import { SkipAuth } from './auth.guard';
 import { AuthService } from './auth.service';
+import { RegisterUserDto, AuthUserDto } from './auth.dto';
 
 /**
  * Type alias for the response body of the authenticateUser function.
@@ -35,7 +35,7 @@ export class AuthController {
   @Post('login')
   @SkipAuth()
   async authenticateUser(
-    @Body() loginDto: SignInCredentials,
+    @Body() loginDto: AuthUserDto,
     @Res() res: Response<AuthenticateUserResponseBody>,
   ) {
     /*
@@ -66,7 +66,7 @@ export class AuthController {
   @Post('register')
   @SkipAuth()
   async addUser(
-    @Body() registerDto: SignUpUserInfo,
+    @Body() registerUserDto: RegisterUserDto,
     @Res() res: Response<AuthenticateUserResponseBody>,
   ) {
     /*
@@ -74,9 +74,9 @@ export class AuthController {
      * No need for try-catch, exception filters will handle errs.
      * */
     const serviceResponse = await this.authService.register(
-      registerDto?.username,
-      registerDto?.email,
-      registerDto?.password,
+      registerUserDto?.username,
+      registerUserDto?.email,
+      registerUserDto?.password,
     );
 
     /* pass result to response */
