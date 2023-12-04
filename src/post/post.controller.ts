@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Post,
@@ -10,12 +11,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { RequestWithUser } from 'src/middleware/token.middleware';
-import { CreatePostDTO } from './post.dto';
+import { CreatePostRequestDTO, CreatePostResponseDTO } from './post.dto';
 import { Post as PostEntity } from './post.entity';
 import { PostService } from './post.service';
 
 @Controller('posts')
 export class PostController {
+  private readonly logger = new Logger(PostController.name);
   constructor(private readonly postService: PostService) {}
 
   /**
@@ -40,31 +42,46 @@ export class PostController {
   /**
    * Create a new post
    * @param postData - Partial data of PostEntity
+   * @param request
    * @returns Created PostEntity object
    */
 
   @Post()
   async createPost(
-    @Body() postData: Partial<CreatePostDTO>,
+    @Body() postData: Partial<CreatePostRequestDTO>,
     @Req() request: RequestWithUser,
-  ): Promise<PostEntity> {
+  ): Promise<CreatePostResponseDTO> {
     const user = request.userEntity;
+    const post = await this.postService.createPost(postData, user);
 
-    return this.postService.createPost(postData, user);
+    return {
+      content: post.content,
+      picture: post.postPicture?.picture_url,
+      post_id: post.post_id,
+    };
   }
 
   /**
    * Update a post by ID
    * @param postId - ID of the post to update
    * @param updateData - Partial data of PostEntity for update
+   * @param req
    * @returns Updated PostEntity object
    */
   @Put(':post_id')
   async updatePost(
     @Param('post_id') postId: string,
-    @Body() updateData: Partial<PostEntity>,
+    @Body() updateData: Partial<CreatePostRequestDTO>,
+    @Req() req: RequestWithUser,
   ): Promise<PostEntity> {
-    const updatedPost = await this.postService.updatePost(postId, updateData);
+    const user = req.userEntity;
+
+    const updatedPost = await this.postService.updatePost(
+      postId,
+      user,
+      updateData,
+    );
+
     if (!updatedPost) {
       throw new NotFoundException('Post not found');
     }
@@ -74,6 +91,7 @@ export class PostController {
   /**
    * Delete a post by ID
    * @param postId - ID of the post to delete
+   * @param request
    */
   @Delete(':post_id')
   async deletePost(
@@ -84,6 +102,7 @@ export class PostController {
     try {
       await this.postService.deletePost(postId, user);
     } catch (error) {
+      this.logger.fatal(error);
       throw new NotFoundException('Post not found');
     }
   }

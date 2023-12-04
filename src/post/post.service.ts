@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
-import { CreatePostDTO } from './post.dto';
+import { CreatePostRequestDTO } from './post.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -43,10 +43,11 @@ export class PostService {
   /**
    * Create a new post
    * @param postData - Partial Post entity data
+   * @param user
    * @returns Newly created Post entity
    */
   async createPost(
-    postData: Partial<CreatePostDTO>,
+    postData: Partial<CreatePostRequestDTO>,
     user: User,
   ): Promise<Post> {
     const newPost = this.postRepository.create({ ...postData, user });
@@ -56,12 +57,17 @@ export class PostService {
   /**
    * Update a post by ID
    * @param post_id - ID of the post to update
+   * @param user
    * @param updateData - Partial Post entity data for update
    * @returns Updated Post entity
    */
-  async updatePost(post_id: string, updateData: Partial<Post>): Promise<Post> {
+  async updatePost(
+    post_id: string,
+    user: User,
+    updateData: Partial<Post>,
+  ): Promise<Post> {
     const postToUpdate = await this.postRepository.findOne({
-      where: { post_id },
+      where: { post_id, user: { user_id: user.user_id } },
     });
     if (!postToUpdate) {
       throw new Error('Post not found');
@@ -91,8 +97,8 @@ export class PostService {
   }
 
   /**
-   * Find posts by user name
-   * @param userName - User name to search for
+   * Find posts by username
+   * @param userName - Username to search for
    * @returns Array of Post entities
    */
   async findPostsByUserName(userName: string): Promise<Post[]> {

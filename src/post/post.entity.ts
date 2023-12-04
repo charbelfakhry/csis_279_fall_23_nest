@@ -51,7 +51,6 @@ export class Post {
    * @param user - User who created the post
    * @param content - Content of the post
    * @param postPicture - Picture associated with the post
-   * @param user_id - ID of the user who created the post
    */
   constructor(user: User, content: string, postPicture: Picture) {
     this.user = user;
