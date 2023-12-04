@@ -77,19 +77,3 @@ export class UpdateUserDto {
     this.profile_picture_url = profile_picture_url;
   }
 }
-
-/**
- * DTO class for user authentication
- */
-export class AuthUserDto {
-  @IsLengthAndNoSpecialChars(4, 20)
-  username: string;
-
-  @IsNotEmpty()
-  password_hash: string;
-
-  constructor(username: string, password: string) {
-    this.username = username;
-    this.password_hash = password;
-  }
-}
