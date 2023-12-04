@@ -4,7 +4,6 @@
 ### This is the main branch. Please do not push changes directly to here. Push the changes to the dev branch and the changes will be later on merged if they are accurate.
 ### ⚠️⚠️⚠️
 
-
 # Description
 
 This is a social media web-app that is built with nestJS and ReactJS.
