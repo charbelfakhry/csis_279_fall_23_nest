@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,16 +10,27 @@ import {
   Post,
   Put,
   Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { PostService } from './post.service';
+import { Post as PostEntity } from './post.entity';
 import { RequestWithUser } from 'src/middleware/token.middleware';
 import { CreatePostRequestDTO, CreatePostResponseDTO } from './post.dto';
-import { Post as PostEntity } from './post.entity';
-import { PostService } from './post.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { resolve } from 'path';
+import e from 'express';
+import { generateUniqueFileName } from '../utils/utils.files';
+import { PictureService } from '../picture/picture.service';
 
 @Controller('posts')
 export class PostController {
   private readonly logger = new Logger(PostController.name);
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly pictureService: PictureService,
+  ) {}
 
   /**
    * Get all posts
@@ -41,18 +53,47 @@ export class PostController {
 
   /**
    * Create a new post
+   * @param file
    * @param postData - Partial data of PostEntity
    * @param request
    * @returns Created PostEntity object
    */
 
   @Post()
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'pic', maxCount: 1 }], {
+      storage: diskStorage({
+        destination: resolve('static', 'images'),
+        /**
+         * Provides a unique name for each file.
+         * @param _
+         * @param file
+         * @param cb
+         */
+        filename(
+          _: e.Request,
+          file: Express.Multer.File,
+          cb: (error: Error | null, filename: string) => void,
+        ) {
+          cb(null, generateUniqueFileName(file.originalname));
+        },
+      }),
+    }),
+  )
   async createPost(
     @Body() postData: Partial<CreatePostRequestDTO>,
+    @UploadedFiles() file: { pic?: Express.Multer.File[] },
     @Req() request: RequestWithUser,
   ): Promise<CreatePostResponseDTO> {
     const user = request.userEntity;
-    const post = await this.postService.createPost(postData, user);
+    const { pic } = file;
+
+    if (!pic || pic.length === 0) throw new BadRequestException('Bad request');
+
+    const img = pic[0];
+
+    const postImage = await this.pictureService.insertPicture(img.filename);
+    const post = await this.postService.createPost(postData, user, postImage);
 
     return {
       content: post.content,
@@ -71,7 +112,7 @@ export class PostController {
   @Put(':post_id')
   async updatePost(
     @Param('post_id') postId: string,
-    @Body() updateData: Partial<CreatePostRequestDTO>,
+    @Body() updateData: Partial<Omit<CreatePostRequestDTO, 'picture'>>,
     @Req() req: RequestWithUser,
   ): Promise<PostEntity> {
     const user = req.userEntity;

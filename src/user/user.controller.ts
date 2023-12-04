@@ -18,6 +18,7 @@ import { diskStorage } from 'multer';
 import e from 'express';
 import { resolve } from 'path';
 import { PictureService } from '../picture/picture.service';
+import { generateUniqueFileName } from '../utils/utils.files';
 
 @Controller('users')
 export class UserController {
@@ -62,10 +63,7 @@ export class UserController {
           file: Express.Multer.File,
           cb: (error: Error | null, filename: string) => void,
         ) {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const fileNameExtension = '.' + file.originalname.split('.').at(-1);
-          cb(null, file.fieldname + '-' + uniqueSuffix + fileNameExtension);
+          cb(null, generateUniqueFileName(file.originalname));
         },
       }),
     }),
