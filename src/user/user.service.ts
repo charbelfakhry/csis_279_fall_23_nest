@@ -100,13 +100,23 @@ export class UserService {
 
   /**
    * Updates the user with the corresponding id
-   * @param id
    * @param user
+   * @param userUpdate
    * @returns Promise<User | null>
    */
-  async updateUser(id: string, user: UpdateUserDto): Promise<User | null> {
-    await this.userRepository.update(id, user);
-    return this.findOneById(id); //return the updated user
+  async updateUser(
+    user: User,
+    userUpdate: UpdateUserDto,
+  ): Promise<User | null> {
+    if (userUpdate.bio) user.bio = userUpdate.bio;
+    if (userUpdate.email) user.email = userUpdate.email;
+    if (userUpdate.password_hash) {
+      user.password_hash = userUpdate.password_hash;
+      await user.hashPassword();
+    }
+    if (userUpdate.full_name) user.full_name = userUpdate.full_name;
+    if (userUpdate.username) user.username = userUpdate.username;
+    return await this.userRepository.save(user);
   }
 
   /**

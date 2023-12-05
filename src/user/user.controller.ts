@@ -53,8 +53,12 @@ export class UserController {
   }
 
   @Put()
-  async updateUser(@Body() id: string, @Body() user: UpdateUserDto) {
-    return this.userService.updateUser(id, user);
+  async updateUser(
+    @Body() userUpdate: UpdateUserDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const user = req.userEntity;
+    return this.userService.updateUser(user, userUpdate);
   }
 
   /**
