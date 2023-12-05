@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommentService } from '../comment/comment.service';
+import { CommentService } from './comment.service';
 import { Picture } from '../picture/picture.entity';
 import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';

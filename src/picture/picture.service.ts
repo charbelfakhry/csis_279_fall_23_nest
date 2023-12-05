@@ -5,6 +5,7 @@ import { cwd } from 'node:process';
 import * as path from 'path';
 import { Repository } from 'typeorm';
 import { Picture } from './picture.entity';
+import { arrayDifference } from '../utils/utils.arrays';
 
 @Injectable()
 export class PictureService {
@@ -24,13 +25,13 @@ export class PictureService {
   async eraseUnusedFiles() {
     const PATH_TO_IMAGES = path.join(cwd(), 'static', 'images');
     this.logger.debug(`DELETING UNUSED IMAGES FROM ${PATH_TO_IMAGES}`);
+
     const allPhotos = new Set(
       (await this.pictureRepository.find()).map((pic) => pic.picture_url),
     );
-    const allSavedPhotos = new Set(await fs.readdir(PATH_TO_IMAGES));
-    const toDelete = new Set(
-      [...allSavedPhotos].filter((x) => !allPhotos.has(x)),
-    );
+    const allSavedPhotos = await fs.readdir(PATH_TO_IMAGES);
+
+    const toDelete = new Set(arrayDifference(allSavedPhotos, allPhotos));
 
     for (const photo of toDelete) {
       await fs.rm(path.join(PATH_TO_IMAGES, photo));

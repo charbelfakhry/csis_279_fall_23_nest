@@ -33,25 +33,6 @@ export class PostController {
   ) {}
 
   /**
-   * Get all posts
-   * @returns Array of PostEntity objects
-   */
-  @Get()
-  async findAll(): Promise<PostEntity[]> {
-    return this.postService.findAll();
-  }
-
-  /**
-   * Get posts by user ID
-   * @param userId - ID of the user
-   * @returns Array of PostEntity objects
-   */
-  @Get(':user_id')
-  async findByUserId(@Param('user_id') userId: string): Promise<PostEntity[]> {
-    return this.postService.findByUserId(userId);
-  }
-
-  /**
    * Create a new post
    * @param file
    * @param postData - Partial data of PostEntity
@@ -149,11 +130,11 @@ export class PostController {
   }
 
   /**
-   * Get posts by user name
-   * @param userName - User name to search for
+   * Get posts by username
+   * @param userName - Username to search for
    * @returns Array of PostEntity objects
    */
-  @Get('user/:userName')
+  @Get(':userName')
   async findPostsByUserName(
     @Param('userName') userName: string,
   ): Promise<PostEntity[]> {
