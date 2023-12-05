@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Put,
   Req,
@@ -17,8 +18,8 @@ import { RequestWithUser } from '../middleware/token.middleware';
 import { diskStorage } from 'multer';
 import e from 'express';
 import { resolve } from 'path';
-import { PictureService } from '../picture/picture.service';
 import { generateUniqueFileName } from '../utils/utils.files';
+import { PictureService } from '../picture/picture.service';
 
 import { ApiOkResponse, ApiResponse } from '@nestjs/swagger/dist';
 
@@ -35,13 +36,27 @@ export class UserController {
   
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
-    return this.userService.findOneById(id);
+    const user = await this.userService.findOneById(id);
+    if (!user) throw new NotFoundException('No such user');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
   @ApiOkResponse({description: 'found user'})
   @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
-    return this.userService.findOneByUsername(username);
+    const user = await this.userService.findOneByUsername(username);
+    if (!user) throw new NotFoundException('No such user.');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
   @ApiOkResponse({description: 'updated user'})

@@ -1,12 +1,12 @@
 import {
-  CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
+import { Post } from '../post/post.entity';
 
 @Entity('likes')
 export class Like {

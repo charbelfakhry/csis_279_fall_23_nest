@@ -23,6 +23,8 @@ import { resolve } from 'path';
 import e from 'express';
 import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
+import { LikeService } from '../like/like.service';
+import { CreatePostLikeDto } from '../like/like.dto';
 
 @Controller('posts')
 export class PostController {
@@ -30,6 +32,7 @@ export class PostController {
   constructor(
     private readonly postService: PostService,
     private readonly pictureService: PictureService,
+    private readonly likeService: LikeService,
   ) {}
 
   /**
@@ -143,5 +146,48 @@ export class PostController {
       throw new NotFoundException('No posts found for this user name');
     }
     return posts;
+  }
+
+  //Likes
+
+  /**
+   * Get all likes for a specific post.
+   * @param {string} postId - The ID of the post.
+   * @returns {Promise<{likes: Like[]}>} - A promise that resolves to an object containing an array of likes.
+   */
+  @Get(':postId/likes')
+  async getLikesForPost(@Param('postId') postId: string) {
+    const likes = await this.likeService.findLikesForPost(postId);
+    return { likes };
+  }
+
+  /**
+   * Like a post.
+   * @param {string} postId - The ID of the post to like.
+   * @param {RequestWithUser} req - The request object, which should contain a userEntity representing the authenticated user.
+   * @returns {Promise<{like: Like}>} - A promise that resolves to an object containing the new like.
+   */
+  @Post(':postId/likes')
+  async likePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
+    const user = req.userEntity;
+    const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
+    const like = await this.likeService.likePost(createPostLikeDto);
+    return { like_id: like?.like_id, created_at: like?.created_at };
+  }
+
+  /**
+   * Unlike a post.
+   * @param {string} postId - The ID of the post to unlike.
+   * @param {RequestWithUser} req - The request object, which should contain a userEntity representing the authenticated user.
+   * @returns {Promise<{unlike: Like}>} - A promise that resolves to an object containing the removed like.
+   */
+  @Delete(':postId/likes')
+  async unlikePost(
+    @Param('postId') postId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const user = req.userEntity;
+    const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
+    await this.likeService.unlikePost(createPostLikeDto);
   }
 }

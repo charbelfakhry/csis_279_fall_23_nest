@@ -53,6 +53,8 @@ export class AppModule {
         { path: '/posts', method: RequestMethod.POST },
         { path: '/posts/:post_id', method: RequestMethod.DELETE },
         { path: '/posts/:post_id', method: RequestMethod.PUT },
+        { path: '/posts/:post_id/likes', method: RequestMethod.POST },
+        { path: '/posts/:post_id/likes', method: RequestMethod.DELETE },
       );
   }
 }
