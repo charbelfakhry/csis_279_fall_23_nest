@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Friendship } from './friendship.entity';
 
@@ -8,7 +8,6 @@ export class FriendshipService {
     @Inject('FRIENDSHIP_REPOSITORY')
     private friendshipRepository: Repository<Friendship>,
   ) {}
-
 
   /**
    * This function is an example of how to use the repository in a service.

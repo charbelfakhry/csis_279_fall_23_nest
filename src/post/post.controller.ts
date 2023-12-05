@@ -1,58 +1,89 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Logger,
   NotFoundException,
   Param,
   Post,
   Put,
   Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostEntity } from './post.entity';
 import { RequestWithUser } from 'src/middleware/token.middleware';
 import { CreatePostRequestDTO, CreatePostResponseDTO } from './post.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { resolve } from 'path';
+import e from 'express';
+import { generateUniqueFileName } from '../utils/utils.files';
+import { PictureService } from '../picture/picture.service';
+import { LikeService } from '../like/like.service';
+import { CreatePostLikeDto } from '../like/like.dto';
+import { ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @Controller('posts')
 export class PostController {
   private readonly logger = new Logger(PostController.name);
-  constructor(private readonly postService: PostService) {}
-
-  /**
-   * Get all posts
-   * @returns Array of PostEntity objects
-   */
-  @Get()
-  async findAll(): Promise<PostEntity[]> {
-    return this.postService.findAll();
-  }
-
-  /**
-   * Get posts by user ID
-   * @param userId - ID of the user
-   * @returns Array of PostEntity objects
-   */
-  @Get(':user_id')
-  async findByUserId(@Param('user_id') userId: string): Promise<PostEntity[]> {
-    return this.postService.findByUserId(userId);
-  }
+  constructor(
+    private readonly postService: PostService,
+    private readonly pictureService: PictureService,
+    private readonly likeService: LikeService,
+  ) {}
 
   /**
    * Create a new post
+   * @param file
    * @param postData - Partial data of PostEntity
    * @param request
    * @returns Created PostEntity object
    */
 
+
+  @ApiOkResponse({ description: 'found user' })
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+
   @Post()
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'pic', maxCount: 1 }], {
+      storage: diskStorage({
+        destination: resolve('static', 'images'),
+        /**
+         * Provides a unique name for each file.
+         * @param _
+         * @param file
+         * @param cb
+         */
+        filename(
+          _: e.Request,
+          file: Express.Multer.File,
+          cb: (error: Error | null, filename: string) => void,
+        ) {
+          cb(null, generateUniqueFileName(file.originalname));
+        },
+      }),
+    }),
+  )
   async createPost(
     @Body() postData: Partial<CreatePostRequestDTO>,
+    @UploadedFiles() file: { pic?: Express.Multer.File[] },
     @Req() request: RequestWithUser,
   ): Promise<CreatePostResponseDTO> {
     const user = request.userEntity;
-    const post = await this.postService.createPost(postData, user);
+    const { pic } = file;
+
+    if (!pic || pic.length === 0) throw new BadRequestException('Bad request');
+
+    const img = pic[0];
+
+    const postImage = await this.pictureService.insertPicture(img.filename);
+    const post = await this.postService.createPost(postData, user, postImage);
 
     return {
       content: post.content,
@@ -71,7 +102,7 @@ export class PostController {
   @Put(':post_id')
   async updatePost(
     @Param('post_id') postId: string,
-    @Body() updateData: Partial<CreatePostRequestDTO>,
+    @Body() updateData: Partial<Omit<CreatePostRequestDTO, 'picture'>>,
     @Req() req: RequestWithUser,
   ): Promise<PostEntity> {
     const user = req.userEntity;
@@ -108,11 +139,13 @@ export class PostController {
   }
 
   /**
-   * Get posts by user name
-   * @param userName - User name to search for
+   * Get posts by username
+   * @param userName - Username to search for
    * @returns Array of PostEntity objects
    */
-  @Get('user/:userName')
+  @ApiOkResponse({ description: 'successful'})
+  @ApiNotFoundResponse({description: 'No posts found for this user name'})
+  @Get(':userName')
   async findPostsByUserName(
     @Param('userName') userName: string,
   ): Promise<PostEntity[]> {
@@ -121,5 +154,57 @@ export class PostController {
       throw new NotFoundException('No posts found for this user name');
     }
     return posts;
+  }
+
+  //Likes
+
+  /**
+   * Get all likes for a specific post.
+   * @param {string} postId - The ID of the post.
+   * @returns {Promise<{likes: Like[]}>} - A promise that resolves to an object containing an array of likes.
+   */
+
+  @ApiOkResponse({description: 'liked found'})
+  
+  @Get(':postId/likes')
+  async getLikesForPost(@Param('postId') postId: string) {
+    const likes = await this.likeService.findLikesForPost(postId);
+    return { likes };
+  }
+
+  /**
+   * Like a post.
+   * @param {string} postId - The ID of the post to like.
+   * @param {RequestWithUser} req - The request which contains the userEntity representing the authenticated user.
+   * @returns {Promise<{like: Like}>} - A promise that resolves to an object containing the new like.
+   */
+
+ @ApiOkResponse({description: 'liked'})
+ @ApiNotFoundResponse({description: 'post not found'})
+  @Post(':postId/likes')
+  async likePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
+    const user = req.userEntity;
+    const createPostLikeDto = new CreatePostLikeDto(user, postId);
+    const like = await this.likeService.likePost(createPostLikeDto);
+    return { like_id: like?.like_id, created_at: like?.created_at };
+  }
+
+  /**
+   * Unlike a post.
+   * @param {string} postId - The ID of the post to unlike.
+   * @param {RequestWithUser} req - The request which contains the userEntity representing the authenticated user.
+   * @returns {Promise<{unlike: Like}>} - A promise that resolves to an object containing the removed like.
+   */
+  @ApiOkResponse({description: 'unliked'})
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+  
+  @Delete(':postId/likes')
+  async unlikePost(
+    @Param('postId') postId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const user = req.userEntity;
+    const createPostLikeDto = new CreatePostLikeDto(user, postId);
+    await this.likeService.unlikePost(createPostLikeDto);
   }
 }

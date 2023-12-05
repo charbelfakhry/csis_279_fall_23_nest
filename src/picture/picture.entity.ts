@@ -1,6 +1,6 @@
 import { Entity, OneToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
+import { User } from '../user/user.entity';
 
 @Entity('pictures')
 export class Picture {

@@ -11,8 +11,8 @@ import { FriendshipModule } from './friendship/friendship.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from './authentication/auth.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+// import { ServeStaticModule } from '@nestjs/serve-static';
+// import { join } from 'path';
 import { JwtMiddleware } from './middleware/token.middleware';
 import { MiddlewareModule } from '@nestjs/core/middleware/middleware-module';
 import { userProviders } from './user/user.providers';
@@ -20,10 +20,10 @@ import { userProviders } from './user/user.providers';
 @Module({
   imports: [
     // static files
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'),
-      serveStaticOptions: { index: false },
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'static'),
+    //   serveStaticOptions: { index: false },
+    // }),
     // rate limiting
     ThrottlerModule.forRoot([
       {
@@ -50,9 +50,12 @@ export class AppModule {
       .apply(JwtMiddleware)
       .forRoutes(
         { path: '/users/profile', method: RequestMethod.PUT },
+        { path: '/users', method: RequestMethod.PUT },
         { path: '/posts', method: RequestMethod.POST },
         { path: '/posts/:post_id', method: RequestMethod.DELETE },
         { path: '/posts/:post_id', method: RequestMethod.PUT },
+        { path: '/posts/:post_id/likes', method: RequestMethod.POST },
+        { path: '/posts/:post_id/likes', method: RequestMethod.DELETE },
       );
   }
 }

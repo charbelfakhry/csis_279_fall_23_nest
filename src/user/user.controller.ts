@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
+  NotFoundException,
   Param,
   Put,
   Req,
@@ -17,28 +19,64 @@ import { RequestWithUser } from '../middleware/token.middleware';
 import { diskStorage } from 'multer';
 import e from 'express';
 import { resolve } from 'path';
+import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
+
+import { ApiBadRequestResponse, ApiOkResponse, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger/dist';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly pictureService: PictureService,
-  ) {}
+  ) { }
+
+
+  @ApiOkResponse({ description: 'found user' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No such user'
+  })
 
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
-    return this.userService.findOneById(id);
+    const user = await this.userService.findOneById(id);
+    if (!user) throw new NotFoundException('No such user');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
+  @ApiOkResponse({ description: 'found user' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No such user'
+  })
   @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
-    return this.userService.findOneByUsername(username);
+    const user = await this.userService.findOneByUsername(username);
+    if (!user) throw new NotFoundException('No such user.');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
+  @ApiOkResponse({ description: 'updated user' })
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+
   @Put()
-  async updateUser(@Body() id: string, @Body() user: UpdateUserDto) {
-    return this.userService.updateUser(id, user);
+  async updateUser(
+    @Body() userUpdate: UpdateUserDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const user = req.userEntity;
+    return this.userService.updateUser(user, userUpdate);
   }
 
   /**
@@ -46,6 +84,9 @@ export class UserController {
    * @param file
    * @param req
    */
+  @ApiOkResponse({ description: 'updated profile picture' })
+  @ApiBadRequestResponse({description: 'profile picture not updated'})
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
   @Put('profile')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }], {
@@ -62,14 +103,12 @@ export class UserController {
           file: Express.Multer.File,
           cb: (error: Error | null, filename: string) => void,
         ) {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const fileNameExtension = '.' + file.originalname.split('.').at(-1);
-          cb(null, file.fieldname + '-' + uniqueSuffix + fileNameExtension);
+          cb(null, generateUniqueFileName(file.originalname));
         },
       }),
     }),
   )
+
   async changeProfileImage(
     @UploadedFiles() file: { avatar?: Express.Multer.File[] },
     @Req() req: RequestWithUser,
@@ -86,6 +125,7 @@ export class UserController {
     req.userEntity = await this.userService.updateProfile(user, pic);
   }
 
+  @ApiOkResponse({ description: 'user deleted' })
   @Delete('/:id')
   async removeUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);

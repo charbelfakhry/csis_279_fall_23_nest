@@ -1,17 +1,17 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  ManyToOne,
-  OneToOne,
+  Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity';
+import { Comment } from '../comment/comment.entity';
 import { Like } from '../like/like.entity';
 import { Picture } from '../picture/picture.entity';
-import { Comment } from '../comment/comment.entity';
+import { User } from '../user/user.entity';
 
 @Entity('posts')
 export class Post {
