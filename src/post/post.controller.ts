@@ -26,7 +26,7 @@ import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 import { LikeService } from '../like/like.service';
 import { CreatePostLikeDto } from '../like/like.dto';
-import { ApiNotFoundResponse, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @Controller('posts')
 export class PostController {
@@ -47,10 +47,8 @@ export class PostController {
 
 
   @ApiOkResponse({ description: 'found user' })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'No such user'
-  })
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'pic', maxCount: 1 }], {
@@ -166,7 +164,8 @@ export class PostController {
    * @returns {Promise<{likes: Like[]}>} - A promise that resolves to an object containing an array of likes.
    */
 
-  @ApiOkResponse({description: ''})
+  @ApiOkResponse({description: 'liked found'})
+  
   @Get(':postId/likes')
   async getLikesForPost(@Param('postId') postId: string) {
     const likes = await this.likeService.findLikesForPost(postId);
@@ -180,11 +179,12 @@ export class PostController {
    * @returns {Promise<{like: Like}>} - A promise that resolves to an object containing the new like.
    */
 
-
+ @ApiOkResponse({description: 'liked'})
+ @ApiNotFoundResponse({description: 'post not found'})
   @Post(':postId/likes')
   async likePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
     const user = req.userEntity;
-    const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
+    const createPostLikeDto = new CreatePostLikeDto(user, postId);
     const like = await this.likeService.likePost(createPostLikeDto);
     return { like_id: like?.like_id, created_at: like?.created_at };
   }
@@ -195,13 +195,16 @@ export class PostController {
    * @param {RequestWithUser} req - The request which contains the userEntity representing the authenticated user.
    * @returns {Promise<{unlike: Like}>} - A promise that resolves to an object containing the removed like.
    */
+  @ApiOkResponse({description: 'unliked'})
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+  
   @Delete(':postId/likes')
   async unlikePost(
     @Param('postId') postId: string,
     @Req() req: RequestWithUser,
   ) {
     const user = req.userEntity;
-    const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
+    const createPostLikeDto = new CreatePostLikeDto(user, postId);
     await this.likeService.unlikePost(createPostLikeDto);
   }
 }

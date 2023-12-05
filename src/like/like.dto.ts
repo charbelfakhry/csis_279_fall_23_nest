@@ -1,14 +1,14 @@
 import { IsNotEmpty } from 'class-validator';
+import { User } from 'src/user/user.entity';
 
 export class CreatePostLikeDto {
-  @IsNotEmpty()
-  userId: string;
+  user: User;
 
   @IsNotEmpty()
   postId: string;
 
-  constructor(userId: string, postId: string) {
-    this.userId = userId;
+  constructor(user: User, postId: string) {
+    this.user = user;
     this.postId = postId;
   }
 }

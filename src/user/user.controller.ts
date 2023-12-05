@@ -22,7 +22,7 @@ import { resolve } from 'path';
 import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 
-import { ApiBadRequestResponse, ApiOkResponse, ApiResponse } from '@nestjs/swagger/dist';
+import { ApiBadRequestResponse, ApiOkResponse, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger/dist';
 
 @Controller('users')
 export class UserController {
@@ -68,6 +68,8 @@ export class UserController {
   }
 
   @ApiOkResponse({ description: 'updated user' })
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
+
   @Put()
   async updateUser(
     @Body() userUpdate: UpdateUserDto,
@@ -84,7 +86,7 @@ export class UserController {
    */
   @ApiOkResponse({ description: 'updated profile picture' })
   @ApiBadRequestResponse({description: 'profile picture not updated'})
-
+  @ApiUnauthorizedResponse({description: 'user not signed in'})
   @Put('profile')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }], {

@@ -20,8 +20,6 @@ export class LikeService {
     private likeRepository: Repository<Like>,
     @Inject('POST_REPOSITORY')
     private postRepository: Repository<Post>,
-    @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
   ) {}
 
   /**
@@ -49,12 +47,8 @@ export class LikeService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    const user = await this.userRepository.findOne({
-      where: { user_id: CreatePostLikeDto.userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = CreatePostLikeDto.user;
+
     const like = this.likeRepository.create({ user, post });
     await this.likeRepository.save(like);
     return like;
@@ -69,7 +63,7 @@ export class LikeService {
   async unlikePost(CreatePostLikeDto: CreatePostLikeDto): Promise<Like | null> {
     const like = await this.likeRepository.findOne({
       where: {
-        user: { user_id: CreatePostLikeDto.userId },
+        user: { user_id: CreatePostLikeDto.user.user_id },
         post: { post_id: CreatePostLikeDto.postId },
       },
     });
