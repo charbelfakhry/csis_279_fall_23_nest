@@ -11,8 +11,8 @@ import { FriendshipModule } from './friendship/friendship.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from './authentication/auth.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+// import { ServeStaticModule } from '@nestjs/serve-static';
+// import { join } from 'path';
 import { JwtMiddleware } from './middleware/token.middleware';
 import { MiddlewareModule } from '@nestjs/core/middleware/middleware-module';
 import { userProviders } from './user/user.providers';
@@ -20,10 +20,10 @@ import { userProviders } from './user/user.providers';
 @Module({
   imports: [
     // static files
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'static'),
-      serveStaticOptions: { index: false },
-    }),
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'static'),
+    //   serveStaticOptions: { index: false },
+    // }),
     // rate limiting
     ThrottlerModule.forRoot([
       {

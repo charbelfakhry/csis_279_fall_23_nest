@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 import { IsLengthAndNoSpecialChars } from 'src/decorators/check.length.chars';
 
@@ -5,9 +6,19 @@ import { IsLengthAndNoSpecialChars } from 'src/decorators/check.length.chars';
  * DTO class for user creation
  */
 export class CreateUserDto {
+  @ApiProperty({
+    description: 'username for the account',
+    example: 'Jhon Doe',
+  })
 
   @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
+
+
+  @ApiProperty({
+    description: 'email for the account',
+    example: 'jhon.doe@gmail.com',
+  })
 
   @IsEmail()
   email: string;

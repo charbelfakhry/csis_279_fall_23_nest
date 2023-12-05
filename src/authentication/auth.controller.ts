@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignInCredentials, SignUpUserInfo } from '../types/auth.types';
 import { SkipAuth } from './auth.guard';
+import { ApiCreatedResponse, ApiResponse, ApiOkResponse } from '@nestjs/swagger/dist';
 
 /**
  * Type alias for the response body of the authenticateUser function.
@@ -33,6 +34,18 @@ export class AuthController {
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
+  @ApiOkResponse({description: 'User Logged in'})
+  @ApiResponse({
+    status: 400,
+    description: 'Missing Data'})
+
+  @ApiResponse({
+    status: 401,
+    description: 'Cannot login with these credentials'})
+
+  @ApiResponse({
+    status: 404,
+    description: 'User does not exist'})
   @SkipAuth()
   async authenticateUser(
     @Body() loginDto: SignInCredentials,
@@ -64,6 +77,11 @@ export class AuthController {
    */
   @HttpCode(HttpStatus.OK)
   @Post('register')
+  @ApiCreatedResponse({description: 'User Registration'})
+  @ApiResponse({
+    status: 401,
+    description: 'Username or Email already exist'})
+
   @SkipAuth()
   async addUser(
     @Body() registerDto: SignUpUserInfo,
