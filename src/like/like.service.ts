@@ -1,7 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Like } from './like.entity';
-import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
 import { CreatePostLikeDto } from './like.dto';
 
@@ -36,9 +35,9 @@ export class LikeService {
   }
 
   /**
-   * Find all likes for a specific comment.
-   * @param {string} commentId - The ID of the comment.
-   * @returns {Promise<Like[]>} - A promise that resolves to an array of likes.
+   * Like a post.
+   * @param {CreatePostLikeDto} CreatePostLikeDto - The DTO containing the user ID and post ID.
+   * @returns {Promise<Like | null>} - A promise that resolves to the created like.
    */
   async likePost(CreatePostLikeDto: CreatePostLikeDto): Promise<Like | null> {
     const post = await this.postRepository.findOne({
@@ -56,8 +55,7 @@ export class LikeService {
 
   /**
    * Unlike a post.
-   * @param {string} userId - The ID of the user.
-   * @param {string} postId - The ID of the post.
+   * @param {CreatePostLikeDto} CreatePostLikeDto - The DTO containing the user ID and post ID.
    * @returns {Promise<Like | null>} - A promise that resolves to the removed like.
    */
   async unlikePost(CreatePostLikeDto: CreatePostLikeDto): Promise<Like | null> {
