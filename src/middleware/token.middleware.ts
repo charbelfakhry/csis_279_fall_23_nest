@@ -10,7 +10,7 @@ import { User } from '../user/user.entity';
 import { Repository } from 'typeorm';
 import { JwtClaims } from './middleware.types';
 
-// And interface that allows the request to have a user property.
+// An interface that allows the request to have a user property.
 export interface RequestWithUser extends Request {
   userEntity: User;
 }

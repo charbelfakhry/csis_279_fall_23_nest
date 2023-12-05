@@ -63,8 +63,8 @@ describe('AuthController (e2e)', () => {
 
   it('/auth/register (POST) - should register user and return token', async () => {
     const signUpUserInfo = {
-      username: 'test4',
-      email: 'test1@test4.com',
+      username: 'test123',
+      email: 'test1@test123.com',
       password: 'password123',
     };
 

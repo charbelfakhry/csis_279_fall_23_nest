@@ -4,20 +4,21 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
-  Post,
   Put,
   Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { UpdateUserDto } from './user.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { RequestWithUser } from '../middleware/token.middleware';
 import { diskStorage } from 'multer';
 import e from 'express';
 import { resolve } from 'path';
+import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 
 @Controller('users')
@@ -27,28 +28,28 @@ export class UserController {
     private readonly pictureService: PictureService,
   ) {}
 
-  @Get('/')
-  async getAll() {
-    return await this.userService.findAll();
-  }
-
-  @Get('/users-by-username/:username')
-  async getUsersByUsername(@Param('username') username: string) {
-    return this.userService.findUsersByUsername(username);
-  }
-
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
-    return this.userService.findOneById(id);
-  }
-  @Get('/by-username/:username')
-  async getUserByUsername(@Param('username') username: string) {
-    return this.userService.findOneByUsername(username);
+    const user = await this.userService.findOneById(id);
+    if (!user) throw new NotFoundException('No such user');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
-  @Post()
-  async addUser(@Body() user: CreateUserDto) {
-    return this.userService.createUser(user);
+  @Get('/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    const user = await this.userService.findOneByUsername(username);
+    if (!user) throw new NotFoundException('No such user.');
+    return {
+      username: user.username,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      email: user.email,
+    };
   }
 
   @Put()
@@ -77,10 +78,7 @@ export class UserController {
           file: Express.Multer.File,
           cb: (error: Error | null, filename: string) => void,
         ) {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const fileNameExtension = '.' + file.originalname.split('.').at(-1);
-          cb(null, file.fieldname + '-' + uniqueSuffix + fileNameExtension);
+          cb(null, generateUniqueFileName(file.originalname));
         },
       }),
     }),

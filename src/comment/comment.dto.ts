@@ -1,20 +1,25 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 /**
  * DTO class for creating Comments
  */
 export class CreateCommentDto {
-    @IsNotEmpty()
-    userId: string;
+  @IsNotEmpty()
+  public content: string;
 
-    @IsNotEmpty()
-    postId: string;
+  constructor(content: string) {
+    this.content = content;
+  }
+}
 
-    content: string;
+export class CommentDto {
+  public content: string;
+  public created_at: Date;
+  public username: string;
 
-    constructor(userId: string, postId: string, content: string) {
-        this.userId = userId;
-        this.postId = postId;
-        this.content = content;
-    }
+  constructor(username: string, content: string, created_at: Date) {
+    this.username = username;
+    this.content = content;
+    this.created_at = created_at;
+  }
 }

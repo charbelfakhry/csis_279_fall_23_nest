@@ -1,9 +1,16 @@
 # Please Read:
 
-### ⚠️⚠️⚠️
-### This is the main branch. Please do not push changes directly to here. Push the changes to the dev branch and the changes will be later on merged if they are accurate.
-### ⚠️⚠️⚠️
 
+This is the dev branch. You can push your changes here and if accurate they will later on me merged.
+
+Please keep note of the following when you want to push a change:
+
+- Add a message to the commit that briefly describes the change you added.
+
+- Before you push, pull the code and handle conflicts if they exist.
+- ### ⚠️️️️️️️⚠️READ THE STYLE GUIDE [STYLEGUIDE.md](STYLEGUIDE.md)⚠️️️️️️️⚠️
+
+---
 # Description
 
 This is a social media web-app that is built with nestJS and ReactJS.
