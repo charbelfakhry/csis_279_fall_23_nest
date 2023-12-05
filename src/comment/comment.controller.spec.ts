@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommentService } from '../comment/comment.service';
 import { Picture } from '../picture/picture.entity';
 import { Post } from '../post/post.entity';
 import { User } from '../user/user.entity';
@@ -7,6 +6,7 @@ import { CommentController } from './comment.controller';
 import { CreateCommentDto } from './comment.dto';
 import { Comment } from './comment.entity';
 import { CommentModule } from './comment.module';
+import { CommentService } from './comment.service';
 
 const mockUser = new User(
   'mock',

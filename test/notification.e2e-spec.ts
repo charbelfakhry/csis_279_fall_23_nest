@@ -59,15 +59,12 @@ describe('NotificationController (e2e)', () => {
       .get(`/notifications/${testNotiID}`)
       .set('authorization', `Bearer ${dummyAuthToken}`)
       .expect(200);
-
     expect(response.body).toEqual({
-      notification: expect.arrayContaining(
-        expect.objectContaining({
-          content: expect.any(String),
-          notification_id: expect.any(String),
-          created_at: expect.any(String),
-        }),
-      ),
+      notification: expect.objectContaining({
+        content: expect.any(String),
+        notification_id: expect.any(String),
+        created_at: expect.any(String),
+      }),
     });
   });
 

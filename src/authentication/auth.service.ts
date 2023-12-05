@@ -66,11 +66,12 @@ export class AuthService {
     /* payload to be added to the JWT token */
     const payload = { sub: user.user_id, email: user.email };
 
+    const jwtDuration = parseInt(process.env.JWT_DURATION);
+    const expiresIn = jwtDuration || 600;
+
     /* status code defined in controller */
     return {
-      access_token: await this.jwtService.signAsync(payload, {
-        expiresIn: Date.now() + parseInt(process.env.JWT_DURATION),
-      }),
+      access_token: await this.jwtService.signAsync(payload, { expiresIn })
     };
   }
 

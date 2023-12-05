@@ -8,12 +8,11 @@
  *
  * @returns The difference between arr1 and arr2.
  */
-export function arrayDifference(arr1: number[], arr2: number[]): number[] {
-  const set1 = new Set(arr1);
+export function arrayDifference(
+  arr1: string[],
+  arr2: string[] | Set<string>,
+): string[] {
   const set2 = new Set(arr2);
 
-  const difference1 = [...arr1.filter((item) => !set2.has(item))];
-  const difference2 = [...arr2.filter((item) => !set1.has(item))];
-
-  return difference1.concat(difference2);
+  return [...arr1.filter((item) => !set2.has(item))];
 }
