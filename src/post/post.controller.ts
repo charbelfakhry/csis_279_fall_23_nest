@@ -176,7 +176,7 @@ export class PostController {
   /**
    * Like a post.
    * @param {string} postId - The ID of the post to like.
-   * @param {RequestWithUser} req - The request object, which should contain a userEntity representing the authenticated user.
+   * @param {RequestWithUser} req - The request which contains the userEntity representing the authenticated user.
    * @returns {Promise<{like: Like}>} - A promise that resolves to an object containing the new like.
    */
 
@@ -192,7 +192,7 @@ export class PostController {
   /**
    * Unlike a post.
    * @param {string} postId - The ID of the post to unlike.
-   * @param {RequestWithUser} req - The request object, which should contain a userEntity representing the authenticated user.
+   * @param {RequestWithUser} req - The request which contains the userEntity representing the authenticated user.
    * @returns {Promise<{unlike: Like}>} - A promise that resolves to an object containing the removed like.
    */
   @Delete(':postId/likes')

@@ -94,21 +94,17 @@ export class UpdateUserDto {
   @IsLengthAndNoSpecialChars(1, 200)
   bio?: string;
 
-  profile_picture_url?: string;
-
   constructor(
     username: string,
     email: string,
     password: string,
     fullName: string,
     bio: string,
-    profile_picture_url?: string,
   ) {
     this.username = username;
     this.email = email;
     this.password_hash = password;
     this.full_name = fullName;
     this.bio = bio;
-    this.profile_picture_url = profile_picture_url;
   }
 }
