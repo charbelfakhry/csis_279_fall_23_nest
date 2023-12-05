@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   NotFoundException,
   Param,
   Put,
@@ -21,19 +22,22 @@ import { resolve } from 'path';
 import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 
-import { ApiOkResponse, ApiResponse } from '@nestjs/swagger/dist';
+import { ApiBadRequestResponse, ApiOkResponse, ApiResponse } from '@nestjs/swagger/dist';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly pictureService: PictureService,
-  ) {}
+  ) { }
 
 
-  @ApiOkResponse({description: 'found user'})
-  @ApiResponse({ description: ''})
-  
+  @ApiOkResponse({ description: 'found user' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No such user'
+  })
+
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
     const user = await this.userService.findOneById(id);
@@ -46,7 +50,11 @@ export class UserController {
     };
   }
 
-  @ApiOkResponse({description: 'found user'})
+  @ApiOkResponse({ description: 'found user' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No such user'
+  })
   @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
     const user = await this.userService.findOneByUsername(username);
@@ -59,7 +67,7 @@ export class UserController {
     };
   }
 
-  @ApiOkResponse({description: 'updated user'})
+  @ApiOkResponse({ description: 'updated user' })
   @Put()
   async updateUser(@Body() id: string, @Body() user: UpdateUserDto) {
     return this.userService.updateUser(id, user);
@@ -70,6 +78,9 @@ export class UserController {
    * @param file
    * @param req
    */
+  @ApiOkResponse({ description: 'updated profile picture' })
+  @ApiBadRequestResponse({description: 'profile picture not updated'})
+
   @Put('profile')
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }], {
@@ -91,6 +102,7 @@ export class UserController {
       }),
     }),
   )
+
   async changeProfileImage(
     @UploadedFiles() file: { avatar?: Express.Multer.File[] },
     @Req() req: RequestWithUser,
@@ -107,7 +119,7 @@ export class UserController {
     req.userEntity = await this.userService.updateProfile(user, pic);
   }
 
-  
+  @ApiOkResponse({ description: 'user deleted' })
   @Delete('/:id')
   async removeUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);

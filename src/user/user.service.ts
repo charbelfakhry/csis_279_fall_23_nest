@@ -3,7 +3,6 @@ import { Like, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { Picture } from '../picture/picture.entity';
-import { ApiResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class UserService {
@@ -105,6 +104,7 @@ export class UserService {
    * @param user
    * @returns Promise<User | null>
    */
+  
   async updateUser(id: string, user: UpdateUserDto): Promise<User | null> {
     await this.userRepository.update(id, user);
     return this.findOneById(id); //return the updated user
@@ -116,7 +116,6 @@ export class UserService {
    * @returns Promise<Void>
    */
 
-  @ApiResponse({description: 'user deleted'})
   async deleteUser(id: string) {
     await this.userRepository.delete(id);
   }

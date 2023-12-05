@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Logger,
   NotFoundException,
   Param,
@@ -25,6 +26,7 @@ import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 import { LikeService } from '../like/like.service';
 import { CreatePostLikeDto } from '../like/like.dto';
+import { ApiNotFoundResponse, ApiOkResponse, ApiResponse } from '@nestjs/swagger';
 
 @Controller('posts')
 export class PostController {
@@ -43,6 +45,12 @@ export class PostController {
    * @returns Created PostEntity object
    */
 
+
+  @ApiOkResponse({ description: 'found user' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No such user'
+  })
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([{ name: 'pic', maxCount: 1 }], {
@@ -137,6 +145,8 @@ export class PostController {
    * @param userName - Username to search for
    * @returns Array of PostEntity objects
    */
+  @ApiOkResponse({ description: 'successful'})
+  @ApiNotFoundResponse({description: 'No posts found for this user name'})
   @Get(':userName')
   async findPostsByUserName(
     @Param('userName') userName: string,
@@ -155,6 +165,8 @@ export class PostController {
    * @param {string} postId - The ID of the post.
    * @returns {Promise<{likes: Like[]}>} - A promise that resolves to an object containing an array of likes.
    */
+
+  @ApiOkResponse({description: ''})
   @Get(':postId/likes')
   async getLikesForPost(@Param('postId') postId: string) {
     const likes = await this.likeService.findLikesForPost(postId);
@@ -167,6 +179,8 @@ export class PostController {
    * @param {RequestWithUser} req - The request object, which should contain a userEntity representing the authenticated user.
    * @returns {Promise<{like: Like}>} - A promise that resolves to an object containing the new like.
    */
+
+
   @Post(':postId/likes')
   async likePost(@Param('postId') postId: string, @Req() req: RequestWithUser) {
     const user = req.userEntity;
