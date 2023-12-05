@@ -2,9 +2,9 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { AuthController } from './auth.controller';
+import { AuthUserDto, RegisterUserDto } from './auth.dto';
 import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
-import { AuthUserDto, RegisterUserDto } from './auth.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -25,7 +25,10 @@ describe('AuthController', () => {
 
   describe('authenticateUser', () => {
     it('should authenticate user and return token', async () => {
-      const signInCredentials = new AuthUserDto('test@example.com', 'password123');
+      const signInCredentials = new AuthUserDto(
+        'test@example.com',
+        'password123',
+      );
 
       const mockResponse: Response = {
         status: jest.fn().mockReturnThis(),
@@ -46,7 +49,10 @@ describe('AuthController', () => {
     });
 
     it('should handle no user errors', async () => {
-      const signInCredentials = new AuthUserDto('test@example.com', 'password123');      
+      const signInCredentials = new AuthUserDto(
+        'test@example.com',
+        'password123',
+      );
 
       const mockResponse: Response = {
         status: jest.fn().mockReturnThis(),
@@ -66,7 +72,10 @@ describe('AuthController', () => {
     });
 
     it('should handle wrong password errors', async () => {
-      const signInCredentials = new AuthUserDto('test@test.com', "incorrectPassword");
+      const signInCredentials = new AuthUserDto(
+        'test@test.com',
+        'incorrectPassword',
+      );
 
       const mockResponse: Response = {
         status: jest.fn().mockReturnThis(),
@@ -90,7 +99,11 @@ describe('AuthController', () => {
 
   describe('addUser', () => {
     it('should register user and return token', async () => {
-      const signUpUserInfo = new RegisterUserDto("testuser", "test@example.com", "password123");
+      const signUpUserInfo = new RegisterUserDto(
+        'testuser',
+        'test@example.com',
+        'password123',
+      );
 
       const mockResponse: Response = {
         status: jest.fn().mockReturnThis(),
@@ -111,7 +124,11 @@ describe('AuthController', () => {
     });
 
     it('should handle username exists errors', async () => {
-      const signUpUserInfo = new RegisterUserDto("test", "test@example.com", "password123");
+      const signUpUserInfo = new RegisterUserDto(
+        'test',
+        'test@example.com',
+        'password123',
+      );
 
       const mockResponse: Response = {
         status: jest.fn().mockReturnThis(),
@@ -119,7 +136,7 @@ describe('AuthController', () => {
       } as any;
 
       jest
-        .spyOn(authService, 'signIn')
+        .spyOn(authService, 'register')
         .mockRejectedValueOnce(new UnauthorizedException('Username exists'));
 
       try {
@@ -132,7 +149,11 @@ describe('AuthController', () => {
   });
 
   it('should handle email exists errors', async () => {
-    const signUpUserInfo = new RegisterUserDto("abc", "test@test.com", "password123");
+    const signUpUserInfo = new RegisterUserDto(
+      'abc123',
+      'test@test.com',
+      'password123',
+    );
 
     const mockResponse: Response = {
       status: jest.fn().mockReturnThis(),
@@ -140,7 +161,7 @@ describe('AuthController', () => {
     } as any;
 
     jest
-      .spyOn(authService, 'signIn')
+      .spyOn(authService, 'register')
       .mockRejectedValueOnce(new UnauthorizedException('Email exists'));
 
     try {

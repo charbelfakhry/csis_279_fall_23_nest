@@ -1,6 +1,14 @@
-import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+} from 'class-validator';
 
-export function IsLengthAndNoSpecialChars(minLength: number, maxLength: number, validationOptions?: ValidationOptions) {
+export function IsLengthAndNoSpecialChars(
+  minLength: number,
+  maxLength: number,
+  validationOptions?: ValidationOptions,
+) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       name: 'isLengthAndNoSpecialChars',
