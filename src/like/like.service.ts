@@ -1,8 +1,10 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { Repository, Equal } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Like } from './like.entity';
 import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
+import { Comment } from '../comment/comment.entity';
+import { CreatePostLikeDto, CreateCommentLikeDto } from './like.dto';
 
 @Injectable()
 export class LikeService {
@@ -13,6 +15,8 @@ export class LikeService {
     private postRepository: Repository<Post>,
     @Inject('COMMENT_REPOSITORY')
     private commentRepository: Repository<Comment>,
+    @Inject('USER_REPOSITORY')
+    private userRepository: Repository<User>,
   ) {}
 
   /**
@@ -24,24 +28,37 @@ export class LikeService {
 
   //Posts:
 
-  async likePost(user: User, postId: string): Promise<Like | null> {
+  async findLikesForPost(postId: string): Promise<Like[]> {
+    return this.likeRepository.find({
+      where: {
+        post: { post_id: postId },
+      },
+    });
+  }
+
+  async likePost(CreatePostLikeDto: CreatePostLikeDto): Promise<Like | null> {
     const post = await this.postRepository.findOne({
-      where: { post_id: postId },
+      where: { post_id: CreatePostLikeDto.postId },
     });
     if (!post) {
-      throw new Error('Post not found');
-      //NotFoundException
+      throw new NotFoundException('Post not found');
+    }
+    const user = await this.userRepository.findOne({
+      where: { user_id: CreatePostLikeDto.userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
     const like = this.likeRepository.create({ user, post });
     await this.likeRepository.save(like);
     return like;
   }
 
-  async unlikePost(user: User, postId: string): Promise<Like | null> {
+  async unlikePost(CreatePostLikeDto: CreatePostLikeDto): Promise<Like | null> {
     const like = await this.likeRepository.findOne({
       where: {
-        user: { user_id: user.user_id },
-        post: { post_id: postId },
+        user: { user_id: CreatePostLikeDto.userId },
+        post: { post_id: CreatePostLikeDto.postId },
       },
     });
     if (like) {
@@ -50,44 +67,48 @@ export class LikeService {
     return like;
   }
 
-  async findLikesForPost(postId: string): Promise<Like[]> {
-    // const post = await this.postRepository.findOne({
-    //   where: { post_id: postId },
-    // });
-    return this.likeRepository.find({ 
-      where:{
-        post: { post_id: postId },
-      },
-    });
-  
-  }
-
   //Comments:
 
-  // async findLikesForComment(commentId: string): Promise<Like[]> {
-  //   const comment = await this.commentRepository.findOne({
-  //     where: { comment_id: commentId },
-  //   });
-  //   if (!comment) {
-  //     throw new Error('Comment not found');
-  //   }
-  //   return this.likeRepository.find({ where: { comment } });
-  // }
+  async findLikesForComment(commentId: string): Promise<Like[]> {
+    return this.likeRepository.find({
+      where: {
+        comment: { comment_id: commentId },
+      },
+    });
+  }
 
-  // async likeComment(commentId: string): Promise<Like> {
-  //   const comment = await this.commentRepository.findOne(commentId);
+  async likeComment(
+    createCommentLikeDto: CreateCommentLikeDto,
+  ): Promise<Like | null> {
+    const comment = await this.commentRepository.findOne({
+      where: { comment_id: createCommentLikeDto.commentId },
+    });
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+    const user = await this.userRepository.findOne({
+      where: { user_id: createCommentLikeDto.userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const like = this.likeRepository.create({ user, comment });
+    await this.likeRepository.save(like);
+    return like;
+  }
 
-  //   const like = this.likeRepository.create({ comment });
-  //   await this.likeRepository.save(like);
-  //   return like;
-  // }
-
-  // async unlikeComment(commentId: string): Promise<Like | null> {
-  //   const comment = await this.commentRepository.findOne(commentId);
-  //   const like = await this.likeRepository.findOne({ where: { comment } });
-  //   if (like) {
-  //     await this.likeRepository.remove(like);
-  //   }
-  //   return like;
-  // }
+  async unlikeComment(
+    createCommentLikeDto: CreateCommentLikeDto,
+  ): Promise<Like | null> {
+    const like = await this.likeRepository.findOne({
+      where: {
+        user: { user_id: createCommentLikeDto.userId },
+        comment: { comment_id: createCommentLikeDto.commentId },
+      },
+    });
+    if (like) {
+      await this.likeRepository.remove(like);
+    }
+    return like;
+  }
 }
