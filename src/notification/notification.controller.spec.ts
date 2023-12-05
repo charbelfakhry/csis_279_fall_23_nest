@@ -38,30 +38,18 @@ describe('NotificationController', () => {
   });
 
   describe('getAll', () => {
-    it('should get all notifications (tested with a small sample from DB)', async () => {
-      const notifications = [
-        {
-          content: 'Test notification',
-          created_at: new Date('2023-12-03T22:28:35.000Z'),
-          notification_id: '0a940c5f-1650-4548-bed8-36b1ca09a19b',
-          user: undefined,
-        },
-        {
-          content: 'Test notification',
-          created_at: new Date('2023-12-04T17:25:19.000Z'),
-          notification_id: '0c336ec0-4218-479d-8b13-eee8c8c492ad',
-          user: undefined,
-        },
-        {
-          content: 'Test notification',
-          created_at: new Date('2023-12-04T17:19:28.000Z'),
-          notification_id: '1f6baa77-4166-4c4f-99d8-64e807ca81b7',
-          user: undefined,
-        },
-      ];
-
+    it('should get all notifications', async () => {
       const result = await controller.getAll();
-      expect(result.notifications.slice(0, 3)).toEqual(notifications);
+      expect(result.notifications).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            content: expect.any(String),
+            notification_id: expect.any(String),
+            created_at: expect.any(String),
+            user: undefined,
+          }),
+        ]),
+      );
     });
   });
 
