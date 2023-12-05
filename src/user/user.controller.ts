@@ -20,6 +20,8 @@ import { resolve } from 'path';
 import { PictureService } from '../picture/picture.service';
 import { generateUniqueFileName } from '../utils/utils.files';
 
+import { ApiOkResponse, ApiResponse } from '@nestjs/swagger/dist';
+
 @Controller('users')
 export class UserController {
   constructor(
@@ -27,16 +29,22 @@ export class UserController {
     private readonly pictureService: PictureService,
   ) {}
 
+
+  @ApiOkResponse({description: 'found user'})
+  @ApiResponse({ description: ''})
+  
   @Get('/:id')
   async getUserById(@Param('id') id: string) {
     return this.userService.findOneById(id);
   }
 
+  @ApiOkResponse({description: 'found user'})
   @Get('/:username')
   async getUserByUsername(@Param('username') username: string) {
     return this.userService.findOneByUsername(username);
   }
 
+  @ApiOkResponse({description: 'updated user'})
   @Put()
   async updateUser(@Body() id: string, @Body() user: UpdateUserDto) {
     return this.userService.updateUser(id, user);
@@ -84,6 +92,7 @@ export class UserController {
     req.userEntity = await this.userService.updateProfile(user, pic);
   }
 
+  
   @Delete('/:id')
   async removeUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);

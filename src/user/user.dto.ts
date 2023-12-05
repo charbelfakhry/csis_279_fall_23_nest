@@ -1,24 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 import { IsLengthAndNoSpecialChars } from '../decorators/check.length.chars';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * DTO class for user creation
  */
 export class CreateUserDto {
-  @ApiProperty({
-    description: 'username for the account',
-    example: 'Jhon Doe',
-  })
+  
 
   @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
 
 
-  @ApiProperty({
-    description: 'email for the account',
-    example: 'jhon.doe@gmail.com',
-  })
+
 
   @IsEmail()
   email: string;
@@ -56,17 +50,46 @@ export class CreateUserDto {
  * Dto class for user update
  */
 export class UpdateUserDto {
+
+  @ApiProperty({
+    description: 'username is valid',
+    example: 'jhondoe',
+  })
   @IsLengthAndNoSpecialChars(4, 20)
   username?: string;
+
+
+  @ApiProperty({
+    description: 'email for the account',
+    example: 'jhon.doe@gmail.com',
+  })
 
   @IsEmail()
   email?: string;
 
+
+  @ApiProperty({
+    description: 'password is strong',
+    example: 'passWord123!',
+  })
+
   @IsStrongPassword()
   password_hash?: string;
 
+  @ApiProperty({
+    description: 'name is valid',
+    example: 'Jhon Doe',
+  })
+
+
   @IsLengthAndNoSpecialChars(4, 30)
   full_name?: string;
+
+  @ApiProperty({
+    description: 'bio is valid',
+    example: 'my life is meaningless',
+  })
+
 
   @IsLengthAndNoSpecialChars(1, 200)
   bio?: string;

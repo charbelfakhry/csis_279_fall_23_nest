@@ -3,6 +3,7 @@ import { Like, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { Picture } from '../picture/picture.entity';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class UserService {
@@ -114,6 +115,8 @@ export class UserService {
    * @param id
    * @returns Promise<Void>
    */
+
+  @ApiResponse({description: 'user deleted'})
   async deleteUser(id: string) {
     await this.userRepository.delete(id);
   }
