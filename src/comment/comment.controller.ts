@@ -1,15 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
   Post,
   Put,
+  Req
 } from '@nestjs/common';
 import { CommentService } from '../comment/comment.service';
 // import { Post } from 'src/post/post.entity';
 import { CommentDto, CreateCommentDto } from './comment.dto';
+import { LikeService } from 'src/like/like.service';
+import { RequestWithUser } from 'src/middleware/token.middleware';
+import { CreateCommentLikeDto } from 'src/like/like.dto';
 
 @Controller()
 export class CommentController {
