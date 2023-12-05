@@ -1,21 +1,15 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { AuthUserDto, RegisterUserDto } from './auth.dto';
+import { SkipAuth } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignInCredentials, SignUpUserInfo } from '../types/auth.types';
 import { SkipAuth } from './auth.guard';
-import { ApiCreatedResponse, ApiResponse, ApiOkResponse } from '@nestjs/swagger/dist';
 
 /**
  * Type alias for the response body of the authenticateUser function.
  */
-type AuthenticateUserResponseBody = {
+export type AuthenticateUserResponseBody = {
   access_token?: string;
   message: string;
 };
@@ -30,7 +24,6 @@ export class AuthController {
    * response codes by the default exception filter.
    *
    * @param loginDto user login credentials.
-   * @param res HTTP response object.
    */
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -48,9 +41,8 @@ export class AuthController {
     description: 'User does not exist'})
   @SkipAuth()
   async authenticateUser(
-    @Body() loginDto: SignInCredentials,
-    @Res() res: Response<AuthenticateUserResponseBody>,
-  ) {
+    @Body() loginDto: AuthUserDto,
+  ): Promise<AuthenticateUserResponseBody> {
     /*
      * should return token, or throw an error that will be filtered.
      * No need for try-catch, exception filters will handle errs.
@@ -60,11 +52,10 @@ export class AuthController {
       loginDto?.password,
     );
 
-    /* pass result to response */
-    res.status(HttpStatus.OK).json({
+    return {
       message: 'Success',
       ...serviceResponse,
-    });
+    };
   }
 
   /**
@@ -72,10 +63,9 @@ export class AuthController {
    * Errors will be resolved to the appropriate
    * response codes by the default exception filter.
    *
-   * @param registerDto user register credentials.
-   * @param res HTTP response object.
+   * @param registerUserDto
    */
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @Post('register')
   @ApiCreatedResponse({description: 'User Registration'})
   @ApiResponse({
@@ -84,23 +74,22 @@ export class AuthController {
 
   @SkipAuth()
   async addUser(
-    @Body() registerDto: SignUpUserInfo,
-    @Res() res: Response<AuthenticateUserResponseBody>,
-  ) {
+    @Body() registerUserDto: RegisterUserDto,
+  ): Promise<AuthenticateUserResponseBody> {
     /*
      * should return token, or throw an error that will be filtered.
      * No need for try-catch, exception filters will handle errs.
      * */
     const serviceResponse = await this.authService.register(
-      registerDto?.username,
-      registerDto?.email,
-      registerDto?.password,
+      registerUserDto?.username,
+      registerUserDto?.email,
+      registerUserDto?.password,
     );
 
-    /* pass result to response */
-    res.status(HttpStatus.OK).json({
+    return {
       message: 'Success',
+
       ...serviceResponse,
-    });
+    };
   }
 }

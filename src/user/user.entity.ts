@@ -50,13 +50,17 @@ export class User {
 
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications!: Notification[];
-  // I am not sure if friendship1 means followed and friendship2 means following
-  // or if it is mutual where we should have only one array stating if there is
-  // a friendship between the two users or not
-  @OneToMany(() => Friendship, (friendship) => friendship.user1)
-  friendships1!: Friendship[];
-  @OneToMany(() => Friendship, (friendship) => friendship.user2)
-  friendships2!: Friendship[];
+
+  // Here, the user is user1 in Frienships, which means the current user is
+  // following the all users2 in the Frienships array.
+  // So the array represents the following of the user.
+  @OneToMany(() => Friendship, (friendship) => friendship.follower)
+  following!: Friendship[];
+
+  // Here, friendships2 means the user is being followed by all the users1 in the
+  // Frienships array. So the array represents the followers of the user.
+  @OneToMany(() => Friendship, (friendship) => friendship.following)
+  followers!: Friendship[];
 
   @OneToOne(() => Picture)
   @JoinColumn({ name: 'profile_picture_url' })
