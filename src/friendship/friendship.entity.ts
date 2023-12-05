@@ -21,22 +21,22 @@ export class Friendship {
   // follower
   // user_id1 in the database
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id1' })
+  @JoinColumn({ name: 'user_id1', foreignKeyConstraintName: 'user_id' })
   follower: User;
 
   // followed
   // user_id2 in the database
   @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id2' })
+  @JoinColumn({ name: 'user_id2', foreignKeyConstraintName: 'user_id' })
   following: User;
 
   @Column({ type: 'text', nullable: false })
-  status: string;
+  status: 'pending' | 'accepted';
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;
 
-  constructor(follower: User, following: User, status: string) {
+  constructor(follower: User, following: User, status: 'pending' | 'accepted') {
     this.follower = follower;
     this.following = following;
     this.status = status;
