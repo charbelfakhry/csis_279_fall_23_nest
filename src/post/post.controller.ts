@@ -4,7 +4,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Logger,
   NotFoundException,
   Param,
@@ -26,7 +25,7 @@ import { generateUniqueFileName } from '../utils/utils.files';
 import { PictureService } from '../picture/picture.service';
 import { LikeService } from '../like/like.service';
 import { CreatePostLikeDto } from '../like/like.dto';
-import { ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @Controller('posts')
 export class PostController {
@@ -164,7 +163,7 @@ export class PostController {
    * @returns {Promise<{likes: Like[]}>} - A promise that resolves to an object containing an array of likes.
    */
 
-  @ApiOkResponse({description: 'liked found'})
+  @ApiOkResponse({description: 'likes found'})
   
   @Get(':postId/likes')
   async getLikesForPost(@Param('postId') postId: string) {

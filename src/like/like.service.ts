@@ -1,7 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Like } from './like.entity';
-import { User } from '../user/user.entity';
 import { Post } from '../post/post.entity';
 import { CreatePostLikeDto } from './like.dto';
 
