@@ -1,6 +1,5 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response } from 'express';
 import { AuthController } from './auth.controller';
 import { AuthUserDto, RegisterUserDto } from './auth.dto';
 import { AuthModule } from './auth.module';
@@ -30,22 +29,13 @@ describe('AuthController', () => {
         'password123',
       );
 
-      const mockResponse: Response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
       jest
         .spyOn(authService, 'signIn')
         .mockResolvedValueOnce({ access_token: 'mockToken' });
 
-      await controller.authenticateUser(signInCredentials, mockResponse);
+      const mockResponse = await controller.authenticateUser(signInCredentials);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Success',
-        access_token: 'mockToken',
-      });
+      expect(mockResponse.message).toEqual('Success');
     });
 
     it('should handle no user errors', async () => {
@@ -54,17 +44,12 @@ describe('AuthController', () => {
         'password123',
       );
 
-      const mockResponse: Response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
       jest
         .spyOn(authService, 'signIn')
         .mockRejectedValueOnce(new NotFoundException('User does not exist'));
 
       try {
-        await controller.authenticateUser(signInCredentials, mockResponse);
+        await controller.authenticateUser(signInCredentials);
       } catch (error: any) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect(error.message).toBe('User does not exist');
@@ -77,11 +62,6 @@ describe('AuthController', () => {
         'incorrectPassword',
       );
 
-      const mockResponse: Response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
       jest
         .spyOn(authService, 'signIn')
         .mockRejectedValueOnce(
@@ -89,7 +69,7 @@ describe('AuthController', () => {
         );
 
       try {
-        await controller.authenticateUser(signInCredentials, mockResponse);
+        await controller.authenticateUser(signInCredentials);
       } catch (error: any) {
         expect(error).toBeInstanceOf(UnauthorizedException);
         expect(error.message).toBe('Cannot login with these credentials');
@@ -105,22 +85,13 @@ describe('AuthController', () => {
         'password123',
       );
 
-      const mockResponse: Response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
       jest
         .spyOn(authService, 'register')
         .mockResolvedValueOnce({ access_token: 'mockToken' });
 
-      await controller.addUser(signUpUserInfo, mockResponse);
+      const mockResponse = await controller.addUser(signUpUserInfo);
 
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Success',
-        access_token: 'mockToken',
-      });
+      expect(mockResponse.message).toEqual('Success');
     });
 
     it('should handle username exists errors', async () => {
@@ -130,17 +101,12 @@ describe('AuthController', () => {
         'password123',
       );
 
-      const mockResponse: Response = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
       jest
         .spyOn(authService, 'register')
         .mockRejectedValueOnce(new UnauthorizedException('Username exists'));
 
       try {
-        await controller.addUser(signUpUserInfo, mockResponse);
+        await controller.addUser(signUpUserInfo);
       } catch (error: any) {
         expect(error).toBeInstanceOf(UnauthorizedException);
         expect(error.message).toBe('Username exists');
@@ -155,17 +121,12 @@ describe('AuthController', () => {
       'password123',
     );
 
-    const mockResponse: Response = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    } as any;
-
     jest
       .spyOn(authService, 'register')
       .mockRejectedValueOnce(new UnauthorizedException('Email exists'));
 
     try {
-      await controller.addUser(signUpUserInfo, mockResponse);
+      await controller.addUser(signUpUserInfo);
     } catch (error: any) {
       expect(error).toBeInstanceOf(UnauthorizedException);
       expect(error.message).toBe('Email exists');

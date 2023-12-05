@@ -1,12 +1,12 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { AuthUserDto, RegisterUserDto } from './auth.dto';
 import { SkipAuth } from './auth.guard';
 import { AuthService } from './auth.service';
-import { RegisterUserDto, AuthUserDto } from './auth.dto';
 
 /**
  * Type alias for the response body of the authenticateUser function.
  */
-type AuthenticateUserResponseBody = {
+export type AuthenticateUserResponseBody = {
   access_token?: string;
   message: string;
 };
