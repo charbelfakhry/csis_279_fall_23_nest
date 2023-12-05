@@ -14,7 +14,6 @@ import { CommentDto, CreateCommentDto } from './comment.dto';
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,
-    // private readonly likeService: LikeService,
   ) {}
 
   @Get(':username/:postId/comments')
@@ -69,40 +68,4 @@ export class CommentController {
     const comments = await this.commentService.findAll();
     return { comments };
   }
-
-  // Likes:
-  //
-  // @Get(':commentId/likes')
-  // async getLikesForComment(@Param('commentId') commentId: string) {
-  //   const likes = await this.likeService.findLikesForComment(commentId);
-  //   return { likes };
-  // }
-  //
-  // @Post(':commentId/likes')
-  // async likeComment(
-  //   @Param('commentId') commentId: string,
-  //   @Req() req: RequestWithUser,
-  // ) {
-  //   const user = req.userEntity;
-  //   const createCommentLikeDto = new CreateCommentLikeDto(
-  //     user.user_id,
-  //     commentId,
-  //   );
-  //   const like = await this.likeService.likeComment(createCommentLikeDto);
-  //   return { like };
-  // }
-  //
-  // @Delete(':commentId/likes')
-  // async unlikeComment(
-  //   @Param('commentId') commentId: string,
-  //   @Req() req: RequestWithUser,
-  // ) {
-  //   const user = req.userEntity;
-  //   const createCommentLikeDto = new CreateCommentLikeDto(
-  //     user.user_id,
-  //     commentId,
-  //   );
-  //   const unlike = await this.likeService.unlikeComment(createCommentLikeDto);
-  //   return { unlike };
-  // }
 }
