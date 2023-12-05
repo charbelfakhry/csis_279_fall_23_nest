@@ -1,10 +1,8 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthUserDto, RegisterUserDto } from './auth.dto';
 import { SkipAuth } from './auth.guard';
+import { ApiCreatedResponse, ApiResponse, ApiOkResponse } from '@nestjs/swagger/dist';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
-import { SignInCredentials, SignUpUserInfo } from '../types/auth.types';
-import { SkipAuth } from './auth.guard';
 
 /**
  * Type alias for the response body of the authenticateUser function.
