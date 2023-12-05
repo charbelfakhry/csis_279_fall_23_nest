@@ -172,7 +172,7 @@ export class PostController {
     const user = req.userEntity;
     const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
     const like = await this.likeService.likePost(createPostLikeDto);
-    return { like };
+    return { like_id: like?.like_id, created_at: like?.created_at };
   }
 
   /**
@@ -188,7 +188,6 @@ export class PostController {
   ) {
     const user = req.userEntity;
     const createPostLikeDto = new CreatePostLikeDto(user.user_id, postId);
-    const unlike = await this.likeService.unlikePost(createPostLikeDto);
-    return { unlike };
+    await this.likeService.unlikePost(createPostLikeDto);
   }
 }

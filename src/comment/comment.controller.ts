@@ -1,26 +1,20 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   NotFoundException,
   Param,
   Post,
   Put,
-  Req
 } from '@nestjs/common';
-import { CommentService } from '../comment/comment.service';
-// import { Post } from 'src/post/post.entity';
+import { CommentService } from './comment.service';
 import { CommentDto, CreateCommentDto } from './comment.dto';
-import { LikeService } from 'src/like/like.service';
-import { RequestWithUser } from 'src/middleware/token.middleware';
-import { CreateCommentLikeDto } from 'src/like/like.dto';
 
 @Controller()
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,
-    private readonly likeService: LikeService,
+    // private readonly likeService: LikeService,
   ) {}
 
   @Get(':username/:postId/comments')
@@ -77,38 +71,38 @@ export class CommentController {
   }
 
   // Likes:
-
-  @Get(':commentId/likes')
-  async getLikesForComment(@Param('commentId') commentId: string) {
-    const likes = await this.likeService.findLikesForComment(commentId);
-    return { likes };
-  }
-
-  @Post(':commentId/likes')
-  async likeComment(
-    @Param('commentId') commentId: string,
-    @Req() req: RequestWithUser,
-  ) {
-    const user = req.userEntity;
-    const createCommentLikeDto = new CreateCommentLikeDto(
-      user.user_id,
-      commentId,
-    );
-    const like = await this.likeService.likeComment(createCommentLikeDto);
-    return { like };
-  }
-
-  @Delete(':commentId/likes')
-  async unlikeComment(
-    @Param('commentId') commentId: string,
-    @Req() req: RequestWithUser,
-  ) {
-    const user = req.userEntity;
-    const createCommentLikeDto = new CreateCommentLikeDto(
-      user.user_id,
-      commentId,
-    );
-    const unlike = await this.likeService.unlikeComment(createCommentLikeDto);
-    return { unlike };
-  }
+  //
+  // @Get(':commentId/likes')
+  // async getLikesForComment(@Param('commentId') commentId: string) {
+  //   const likes = await this.likeService.findLikesForComment(commentId);
+  //   return { likes };
+  // }
+  //
+  // @Post(':commentId/likes')
+  // async likeComment(
+  //   @Param('commentId') commentId: string,
+  //   @Req() req: RequestWithUser,
+  // ) {
+  //   const user = req.userEntity;
+  //   const createCommentLikeDto = new CreateCommentLikeDto(
+  //     user.user_id,
+  //     commentId,
+  //   );
+  //   const like = await this.likeService.likeComment(createCommentLikeDto);
+  //   return { like };
+  // }
+  //
+  // @Delete(':commentId/likes')
+  // async unlikeComment(
+  //   @Param('commentId') commentId: string,
+  //   @Req() req: RequestWithUser,
+  // ) {
+  //   const user = req.userEntity;
+  //   const createCommentLikeDto = new CreateCommentLikeDto(
+  //     user.user_id,
+  //     commentId,
+  //   );
+  //   const unlike = await this.likeService.unlikeComment(createCommentLikeDto);
+  //   return { unlike };
+  // }
 }
